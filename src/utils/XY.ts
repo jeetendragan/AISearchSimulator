@@ -1,4 +1,9 @@
 export class XY{
+    
+    public static BasisX = new XY(1, 0);
+    public static BasisY = new XY(0, 1);
+    public static BasisXY = new XY(1, 1);
+
     public X : number;
     public Y : number;
 

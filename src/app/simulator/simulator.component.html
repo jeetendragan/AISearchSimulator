@@ -1,16 +1,14 @@
 <div fxLayout="row" class="contentMain" id="contentMain">
     <div class="canvasWrapper" id="canvasWrapper">
         <canvas class="canvasElement" id="canvasElement"></canvas>
-        <div class="floatingMainMenu" fxLayout="column">
+        <div class="floatingMainMenu" fxLayout="column" *ngIf="activeObject == null">
             <div fxLayout="row">
-                <button mat-icon-button class="optionsButton" matTooltip="Add node" matTooltipPosition="below">
+                <button mat-icon-button class="optionsButton" matTooltip="Add node" matTooltipPosition="below" (click)="AddNode()">
                     <mat-icon>scatter_plot</mat-icon>
                 </button>
-                <button mat-icon-button class="optionsButton" matTooltip="Add Edge" matTooltipPosition="below">
+                <button mat-icon-button (click)="toggleEdgeState()" class="optionsButton" matTooltip="Add Edge" matTooltipPosition="below"
+                    [style.color]="isLinkingEnabled ? '#FFFFFF':'#000000'" [style.backgroundColor]="isLinkingEnabled ? '#008000':'#FFFFFF'">
                     <mat-icon>call_made</mat-icon>
-                </button>
-                <button mat-icon-button class="optionsButton" matTooltip="Fit to screen" matTooltipPosition="below">
-                    <mat-icon>center_focus_strong</mat-icon>
                 </button>
                 <button mat-icon-button class="optionsButton" matTooltip="How to use the simulator?" matTooltipPosition="below">
                     <mat-icon>help</mat-icon>
@@ -30,6 +28,54 @@
                 <button mat-raised-button>
                     Start simulation
                     <mat-icon>play_arrow</mat-icon>
+                </button>
+            </div>
+        </div>
+        <div class="floatingMainMenu" fxLayout="column" *ngIf="activeObject != null && activeObject.type=='UIElementNode'">
+            <div style="margin-bottom: 5px;">Node type: {{getNodeTypeAsString(activeObject)}} </div>
+            <div style="margin-bottom: 5px;">
+                <button disabled="getNodeTypeAsString(activeObject) == 'Start'" 
+                    mat-raised-button 
+                    style="background-color: #0849A2; color: white;">
+                    Make start state
+                </button>
+            </div>
+            <div style="margin-bottom: 5px;">
+                <button disabled="getNodeTypeAsString(activeObject) == 'Goal'" 
+                    mat-raised-button style="background-color: #08A229; color: white;">
+                    Make goal state
+                </button>
+            </div>
+            <div style="margin-bottom: 5px;">
+                <button disabled="getNodeTypeAsString(activeObject) == 'Intermediate' "
+                    mat-raised-button class="optionsButton" 
+                    style="background-color: #FF5733; color: white">
+                    Make intermediate state
+                </button>
+            </div>
+        </div>
+        <div class="floatingMainMenu" *ngIf="activeObject != null && activeObject.type=='UIElementEdge'">
+            This is an edge
+        </div>
+        <div class="uiUtilityMenu" fxLayout="column">
+            <div>
+                <button mat-icon-button class="optionsButton" matTooltip="Zoom in" matTooltipPosition="below">
+                    <mat-icon>zoom_in</mat-icon>
+                </button>
+            </div>
+            <div>
+                <button mat-icon-button class="optionsButton" matTooltip="Zoom out" matTooltipPosition="below">
+                    <mat-icon>zoom_out</mat-icon>
+                </button>
+            </div>
+            <div>
+                <button mat-icon-button class="optionsButton" matTooltip="Fit to screen" matTooltipPosition="below">
+                    <mat-icon>center_focus_strong</mat-icon>
+                </button>
+            </div>
+            <div>
+                <button mat-icon-button class="optionsButton" matTooltip="Pan" matTooltipPosition="below" (click)="togglePan()" [style.color]=" isDragButtonEnabled ? 'black':'lightgrey'">
+                    <mat-icon>pan_tool</mat-icon>
                 </button>
             </div>
         </div>

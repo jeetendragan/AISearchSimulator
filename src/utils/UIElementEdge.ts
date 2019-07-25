@@ -23,6 +23,7 @@ export var UIElementEdge = fabric.util.createClass(fabric.Line, {
     this.set("stroke","#FFF");
     this.set("fill","#FFF");
     this.set("strokeWidth",2);
+    this.set("selectable", false);
     // this.set("selectable", false);
     this.set("hasControls", false);
     this.set("perPixelTargetFind",true);

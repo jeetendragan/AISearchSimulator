@@ -39,9 +39,10 @@
     max-height: 70vh;
     /* border: 2px solid darkblue; */
     /* overflow-y: scroll; */
+    max-width: 180px;
 }
 
-.generalOptionsMenu{
+.uiUtilityMenu{
     left: 0;
     top: 0;
     position: absolute;
@@ -49,6 +50,6 @@
     margin-left: 5px; */
 }
 
-.optionsButton{
-    
+.uiUtilityMenu .optionsButton{
+    color: lightgrey;
 }

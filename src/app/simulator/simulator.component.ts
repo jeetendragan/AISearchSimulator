@@ -3,8 +3,16 @@ import { Component, OnInit } from '@angular/core';
 import { XY } from "../../Utils/XY";
 import { UIElementNode, NodeType } from "../../utils/UIElementNode";
 import { UIElementEdge } from '../../utils/UIElementEdge';
+import { Utility } from 'src/utils/Utility';
+import { IdGenerator } from 'src/utils/IdGenerator';
+import { MAT_CHIPS_DEFAULT_OPTIONS } from '@angular/material';
 
 declare let fabric;
+
+export enum CanvasState{
+  Normal = 1,
+  DrawingEdge
+}
 
 @Component({
   selector: 'app-simulator',
@@ -19,6 +27,13 @@ export class SimulatorComponent implements OnInit {
   private zoom : number;
   private algorithms : String[] = ["Breadth first", "Depth first", "A*"];
   private selectedAlgorithm : String = "";
+  private nodes : any = {};
+  private edges : any = {};
+  private isLinkingEnabled : boolean = false;
+  private isDragButtonEnabled : boolean = false;
+  private activeObject : any = null;
+  private tempEdge : any = null; 
+  private idGenerator : IdGenerator = new IdGenerator(Number.MAX_SAFE_INTEGER);
 
   constructor() { }
 
@@ -36,6 +51,9 @@ export class SimulatorComponent implements OnInit {
       height: this.canvasElement_height,
       preserveObjectStacking: true
     });
+
+    // initialize the drag to false
+    this.canvas.isDragging = false;
 
     this.canvas.on('mouse:wheel', (opt) => {
       console.log("Wheel");
@@ -59,13 +77,60 @@ export class SimulatorComponent implements OnInit {
       this.canvas.isDragging = false;
       this.canvas.selection = true;
       this.canvas.mouseDown = false;
+      debugger;
+
+      // Get the old selection
+      var oldSelection = this.activeObject;
+      // Get the current selection
+      this.activeObject = this.canvas.getActiveObject();
+
+      if (this.isLinkingEnabled) {
+
+        if (oldSelection != null && this.activeObject != null) {
+
+          if (this.isEdge(oldSelection) || this.isEdge(this.activeObject)) {
+            // if either of the objects are Edges, then we do not proceed
+            this.canvas.remove(this.tempEdge);
+            return;
+          }
+
+          if (oldSelection != this.activeObject) {
+            console.log("Different selection");
+
+            // remove the temporary edge
+            this.canvas.remove(this.tempEdge);
+            let rid = this.idGenerator.generateNew();
+            
+            // draw a line from the current selection to the new selection
+            let edge = new UIElementEdge([oldSelection.left, oldSelection.top, this.activeObject.left, this.activeObject.top],
+              {
+                id: rid,
+                source: oldSelection,
+                destination: this.activeObject
+              }
+            );
+
+            this.registerNodeInEdge(edge, oldSelection, this.activeObject);
+
+          } else {
+            console.log("Same selection");
+            this.canvas.remove(this.tempEdge);
+          }
+        } else if (oldSelection != null && this.activeObject == null) {
+          console.log("An edge was selected before, but nothing has been selected in this click");
+          // remove the temp edge
+          this.canvas.remove(this.tempEdge);
+        }
+      }
+
+
     });
 
     this.canvas.on('mouse:down',(opt)=>{
       // debugger
       this.canvas.mouseDown = true;
       var evt = opt.e;
-      if (evt.altKey === true) {
+      if (evt.altKey === true || this.isDragButtonEnabled) {
         console.log("Alt and down");
         this.canvas.isDragging = true;
         this.canvas.selection = false;
@@ -95,38 +160,240 @@ export class SimulatorComponent implements OnInit {
         this.canvas.lastPosX = e.clientX;
         this.canvas.lastPosY = e.clientY;
       }
+
+      // **START** draw a temporary arrow (rep. an edge) for visual feedback******//
+      if (this.isLinkingEnabled && this.activeObject != null) {
+
+        // draw an edge from the selected item to the current mouse location
+
+        if (this.tempEdge != null) {
+          this.canvas.remove(this.tempEdge);
+        }
+
+        this.tempEdge =
+          new UIElementEdge(
+            [this.activeObject.left, this.activeObject.top, point.X, point.Y], {
+              id: -1,
+              fill: '#959494',
+              stroke: '#959494',
+              strokeWidth: 2,
+              selectable: false
+            }
+          );
+
+        this.canvas.add(this.tempEdge);
+        this.canvas.sendToBack(this.tempEdge);
+        this.canvas.requestRenderAll();
+      }
+      // **END** draw a temporary arrow for visual feedback ends here ******//
+
+
+      // **START**if the node is being moved, move the associated edges with a node***//
+      let currentSelection = this.canvas.getActiveObject();
+      if (this.isNode(currentSelection)) {
+        debugger;
+        // iterate over all the asSource edges
+        let edge;
+
+        // iterate over all the asSource edges
+        this.objectKeys(currentSelection.asSource).forEach(edgeKey => {
+          edge = currentSelection.asSource[edgeKey];
+          edge.set({
+            x1: currentSelection.left,
+            y1: currentSelection.top,
+            dirty: true
+          });
+        });
+
+        // iterate over all the asDestination edges     
+        this.objectKeys(currentSelection.asDestination).forEach(edgeKey => {
+          edge = currentSelection.asDestination[edgeKey];
+          edge.set({
+            x2: currentSelection.left,
+            y2: currentSelection.top,
+            dirty: true
+          });
+        });
+
+        // render dirty members on the canavs
+        this.canvas.requestRenderAll();
+
+      }
+      // **END**if the node is being moved, move the associated edges with a node, if 
+
+    }); 
+
+    this.canvas.on('mouse:dblclick', (opt) => {
+      var selectedElement = this.canvas.getActiveObject();
+      console.log("Double click");
+      if (selectedElement != null)
+        return;
+      
+      // create a new node with default values at the location of double click
+      var point = new XY(opt.e.layerX, opt.e.layerY);
+      var viewportTransform = this.canvas.viewportTransform;
+      var xDelta = this.canvas.viewportTransform[4] * -1;
+      var yDelta = this.canvas.viewportTransform[5] * -1;
+
+      point.X = (1 / viewportTransform[0]) * (point.X + xDelta);
+      point.Y = (1 / viewportTransform[3]) * (point.Y + yDelta);
+
+      this.createNewNodeAt(point);
     });
 
-    let node = new UIElementNode({
-      id:1,
-      nodeType:NodeType.Start,
-      left:200,
-      top:200
-    });
-    this.canvas.add(node);
+    document.addEventListener('keydown', (event) => {
+      console.log(event.key);
+      if (event.key == "Delete") {
+        // Implement code to delete an edge or a node
+      }
 
-    let nodeInterm = new UIElementNode({
-      id:1,
-      nodeType:NodeType.Intermediate,
-      left:400,
-      top:200
-    });
-    this.canvas.add(nodeInterm);
-
-    let nodeEnd = new UIElementNode({
-      id:1,
-      nodeType:NodeType.Goal,
-      left:300,
-      top:200
-    });
-    this.canvas.add(nodeEnd);
-
-    let edge = new UIElementEdge([10,10, 100, 100],{
-      id:2
+      if (event.key == "Escape" && this.isLinkingEnabled) {
+        // if esacpe has been clicked and we are in the linking state
+        // deactivate an object that may have been active
+        this.canvas.discardActiveObject();
+        this.canvas.requestRenderAll();
+        this.activeObject = null;
+        //remove the temp edge if there exists one
+        if (this.tempEdge != null) {
+          this.canvas.remove(this.tempEdge);
+        }
+      }
+      
     });
 
+  }
+
+  registerNodeInEdge(edge: any, oldSelection: any, currentSelection: any) {
     this.canvas.add(edge);
+    this.edges[edge.id] = edge;
+    //add the edge in the asSource and asDestination members of the source and destination node
+    oldSelection.asSource[edge.id] = edge;
+    currentSelection.asDestination[edge.id] = edge;
     this.canvas.sendToBack(edge);
+  }
+
+  isEdge(obj: any): boolean {
+    if(obj == null)
+      return false;
+
+    return obj.type == "UIElementEdge";
+
+  }
+
+  objectKeys(object) {
+    return Object.keys(object);
+  }
+
+  AddNode(){
+    // Get the center of the screen (in screen coordinates)
+    var screenCenter : XY = this.getScreenCenter();
+    var screenCenterInCanvasSystem : XY = this.transformScreenToCanvas(screenCenter);
+    debugger;
+    var boxMin = screenCenterInCanvasSystem.add(XY.BasisXY.multiply(-1*100));
+    var boxMax = screenCenterInCanvasSystem.add(XY.BasisXY.multiply(100));
+
+    // generate a random point within a box in the centre of the screen
+    var newNodePos : XY = Utility.GenerateRandomPointInBox(boxMin, boxMax);
+    this.createNewNodeAt(newNodePos);
+  }
+
+  transformScreenToCanvas(pointInScreenSystem: XY): XY {
+    var pointInCanvasSystem : XY;
+
+    // get transform from screen system to canvas system
+    var viewportTransform = this.canvas.viewportTransform;
+    var xDelta = this.canvas.viewportTransform[4] * -1;
+    var yDelta = this.canvas.viewportTransform[5] * -1;
+
+    var X = (1 / viewportTransform[0]) * (pointInScreenSystem.X + xDelta);
+    var Y = (1 / viewportTransform[3]) * (pointInScreenSystem.Y + yDelta);
+
+    pointInCanvasSystem = new XY(X, Y);
+
+    return pointInCanvasSystem;
+  }
+
+  getScreenCenter(): XY {
+    return new XY(this.canvasElement_width/2, this.canvasElement_height/2);
+  }
+
+  createNewNodeAt(point: XY) {
+    let id = Object.keys(this.nodes).length+1;
+    let node = new UIElementNode({
+      id: id,
+      left: point.X,
+      top: point.Y
+    });
+    this.registerNodeInGraph(node);
+    this.canvas.setActiveObject(node);
+    this.activeObject = node;
+    this.canvas.requestRenderAll();
+  }
+  
+  registerNodeInGraph(node: any) {
+    this.canvas.add(node);
+    this.nodes[node.id] = node;
+  }
+
+  toggleEdgeState(){
+    this.isLinkingEnabled = !this.isLinkingEnabled;
+  }
+
+  togglePan(){
+    debugger;
+    this.isDragButtonEnabled = !this.isDragButtonEnabled;
+  }
+
+  getNodeTypeAsString(node: any) : string{
+    if(this.isNode(node)){
+      var nodeType : NodeType = node.nodeType;
+      switch(nodeType){
+        case NodeType.Intermediate:
+        {
+          return "Intermediate";
+        }
+        case NodeType.Goal:{
+          return "Goal";
+        }
+        case NodeType.Start:{
+          return "Start";
+        }
+      }
+    }else{
+      return "OOPs, something went wrong!";
+    }
+  }
+
+  isNode(node: any) {
+    if(node == null)
+      return false;
+    
+    return node.type == "UIElementNode";
+  }
+
+  isStartNode(node: any) : boolean{
+    return false;
+    if(!this.isNode(node))
+      throw new DOMException("The object is not UIElementNode type");
+    debugger;
+    var nodeType : NodeType = node.nodeType;
+    return (nodeType == NodeType.Start);
+  }
+
+  isGoalNode(node : any ) : boolean{
+    if(!this.isNode(node))
+      throw new DOMException("The object is not UIElementNode type");
+    debugger;
+    var nodeType : NodeType = node.nodeType;
+    return (nodeType == NodeType.Goal);
+  }
+
+  isIntermediateNode(node: any) : boolean{
+    if(!this.isNode(node))
+      throw new DOMException("The object is not UIElementNode type");
+    debugger;
+    var nodeType : NodeType = node.nodeType;
+    return (nodeType == NodeType.Intermediate);
   }
 
 }

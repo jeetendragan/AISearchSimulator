@@ -51,9 +51,9 @@ export var UIElementNode = fabric.util.createClass(fabric.Circle, {
             }
         }
 
-        this.set("shadow", { color: "rgb(0,0,0)", blur: 2, offsetX: 0, offsetY: 0 });
-        this.set("strokeWidth",2);
-        this.set("stroke", "#FFFFFF");
+        this.set("shadow", { color: "rgb(0,0,0)", blur: 3, offsetX: 0, offsetY: 0 });
+        //this.set("strokeWidth",2);
+        //this.set("stroke", "#FFFFFF");
         this.set("lockRotation", true);
         this.set("lockScalingX", true);
         this.set("lockScalingY", true);
