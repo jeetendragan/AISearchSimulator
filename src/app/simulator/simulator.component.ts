@@ -1,11 +1,12 @@
 import 'fabric';
 import { Component, OnInit } from '@angular/core';
 import { XY } from "../../Utils/XY";
-import { UIElementNode, NodeType } from "../../utils/UIElementNode";
-import { UIElementEdge } from '../../utils/UIElementEdge';
-import { Utility } from 'src/utils/Utility';
-import { IdGenerator } from 'src/utils/IdGenerator';
-import { MAT_CHIPS_DEFAULT_OPTIONS } from '@angular/material';
+import { UIElementNode, NodeType, NodeColorMapper } from "../../Utils/UIElementNode";
+import { UIElementEdge } from '../../Utils/UIElementEdge';
+import { Utility } from 'src/Utils/Utility';
+import { IdGenerator } from 'src/Utils/IdGenerator';
+import { SearchSolvers } from 'src/Utils/SearchSolvers';
+import { MatSnackBar } from '@angular/material';
 
 declare let fabric;
 
@@ -21,23 +22,55 @@ export enum CanvasState{
 })
 export class SimulatorComponent implements OnInit {
 
-  private canvas;
-  private canvasElement_width : number;
-  private canvasElement_height : number;
-  private zoom : number;
-  private algorithms : String[] = ["Breadth first", "Depth first", "A*"];
-  private selectedAlgorithm : String = "";
-  private nodes : any = {};
-  private edges : any = {};
-  private isLinkingEnabled : boolean = false;
-  private isDragButtonEnabled : boolean = false;
-  private activeObject : any = null;
-  private tempEdge : any = null; 
-  private idGenerator : IdGenerator = new IdGenerator(Number.MAX_SAFE_INTEGER);
+  public canvas;
+  public canvasElement_width : number;
+  public canvasElement_height : number;
+  public zoom : number;
+  public algorithms : String[] = ["Breadth first", "Depth first", "A*"];
+  public selectedAlgorithm : String = "";
+  public nodes : any = {};
+  public edges : any = {};
+  public isLinkingEnabled : boolean = false;
+  public isDragButtonEnabled : boolean = false;
+  public activeObject : any = null;
+  public tempEdge : any = null; 
+  public idGenerator : IdGenerator = new IdGenerator(Number.MAX_SAFE_INTEGER);
+  public startNode : any = null;
+  public goalNode : any = null;
+  public numbers : number[] = [];
 
-  constructor() { }
+  constructor(private snackBar: MatSnackBar) { }
+
+  getSentence(offset, callback){
+    
+    this.getSentenceFragment(offset, (fragment) => {
+      
+      if(fragment.nextPage){
+        this.getSentence(fragment.nextPage, (nextFragment) => {
+          callback(fragment.data.concat(nextFragment.data));
+        });
+      }else{
+        callback(fragment.data);
+      }
+
+    });
+
+  }
+
+  getSentenceFragment = (offset, callback) => {
+
+    const pageSize = 3;
+    const sentence = [...'hello world'];
+    setTimeout(() => callback({
+      data: sentence.slice(offset, offset + pageSize),
+      nextPage: offset +
+          pageSize < sentence.length ? offset + pageSize : undefined
+    }), 2000);
+
+  };
 
   ngOnInit() {
+    this.getSentence(0, (data) => console.log(data));
   }
 
   ngAfterViewInit() {
@@ -191,7 +224,7 @@ export class SimulatorComponent implements OnInit {
       // **START**if the node is being moved, move the associated edges with a node***//
       let currentSelection = this.canvas.getActiveObject();
       if (this.isNode(currentSelection)) {
-        debugger;
+        // debugger;
         // iterate over all the asSource edges
         let edge;
 
@@ -263,6 +296,31 @@ export class SimulatorComponent implements OnInit {
 
   }
 
+  runSimulator(){
+    switch(this.selectedAlgorithm)
+    {
+      case this.algorithms[0]:
+      {
+
+      }
+      case this.algorithms[1]:
+      {
+        var result = SearchSolvers.ValidateGraph(this);
+        if(result.isValid){
+          var res = SearchSolvers.SolveByDepthFirst(this);
+          this.snackBar.open(res.message, "Okay!");
+        }
+        else{
+          this.snackBar.open(result.message, "Got it!");
+        }
+      }
+      case this.algorithms[2]:
+      {
+
+      }
+    }
+  }
+
   registerNodeInEdge(edge: any, oldSelection: any, currentSelection: any) {
     this.canvas.add(edge);
     this.edges[edge.id] = edge;
@@ -288,7 +346,7 @@ export class SimulatorComponent implements OnInit {
     // Get the center of the screen (in screen coordinates)
     var screenCenter : XY = this.getScreenCenter();
     var screenCenterInCanvasSystem : XY = this.transformScreenToCanvas(screenCenter);
-    debugger;
+    // debugger;
     var boxMin = screenCenterInCanvasSystem.add(XY.BasisXY.multiply(-1*100));
     var boxMax = screenCenterInCanvasSystem.add(XY.BasisXY.multiply(100));
 
@@ -340,7 +398,7 @@ export class SimulatorComponent implements OnInit {
   }
 
   togglePan(){
-    debugger;
+    // debugger;
     this.isDragButtonEnabled = !this.isDragButtonEnabled;
   }
 
@@ -375,7 +433,6 @@ export class SimulatorComponent implements OnInit {
     return false;
     if(!this.isNode(node))
       throw new DOMException("The object is not UIElementNode type");
-    debugger;
     var nodeType : NodeType = node.nodeType;
     return (nodeType == NodeType.Start);
   }
@@ -383,7 +440,6 @@ export class SimulatorComponent implements OnInit {
   isGoalNode(node : any ) : boolean{
     if(!this.isNode(node))
       throw new DOMException("The object is not UIElementNode type");
-    debugger;
     var nodeType : NodeType = node.nodeType;
     return (nodeType == NodeType.Goal);
   }
@@ -391,9 +447,88 @@ export class SimulatorComponent implements OnInit {
   isIntermediateNode(node: any) : boolean{
     if(!this.isNode(node))
       throw new DOMException("The object is not UIElementNode type");
-    debugger;
     var nodeType : NodeType = node.nodeType;
     return (nodeType == NodeType.Intermediate);
+  }
+
+  makeStartNode(node : any){
+    debugger;
+    if(this.startNode != null){
+      this.startNode.set({
+        fill : NodeColorMapper.GetIntermediateNodeColor(),
+        dirty : true,
+        nodeType : NodeType.Intermediate
+      });
+    }
+
+    this.activeObject.set({
+      fill : NodeColorMapper.GetStartNodeColor(),
+      dirty : true,
+      nodeType : NodeType.Start
+    });
+
+    this.startNode = this.activeObject;
+    
+    this.canvas.requestRenderAll();
+  }
+
+  makeGoalNode(node : any){
+    if(this.goalNode != null){
+      
+      this.goalNode.set({
+        fill : NodeColorMapper.GetIntermediateNodeColor(),
+        dirty : true,
+        nodeType : NodeType.Intermediate
+      });
+
+    }
+
+    this.activeObject.set({
+      fill : NodeColorMapper.GetGoalNodeColor(),
+      dirty : true,
+      nodeType : NodeType.Goal
+    });
+
+    this.goalNode = this.activeObject;
+
+    this.canvas.requestRenderAll();
+
+  }
+
+  makeIntermediateNode(node : any){
+    if(this.goalNode == node){
+      this.goalNode.set({
+        fill : NodeColorMapper.GetIntermediateNodeColor(),
+        dirty : true,
+        nodeType : NodeType.Intermediate
+      });
+      this.goalNode = null;
+    }
+
+    if(this.startNode == node){
+      this.startNode.set({
+        fill : NodeColorMapper.GetIntermediateNodeColor(),
+        dirty : true,
+        nodeType : NodeType.Intermediate
+      });
+      this.startNode = null;
+    }
+
+    this.canvas.requestRenderAll();
+
+  }
+
+  getDestinationNodesFor(currentNode: any): any[] {
+    var destinationNodes = [];
+    Object.keys(currentNode.asSource).forEach(edgeId => {
+      var edge = this.getEdge(edgeId);
+      destinationNodes.push(edge.destination);
+    });
+    return destinationNodes;
+  }
+
+  getEdge(edgeId: string) {
+    return this.edges[edgeId];
   }
 
 }

@@ -12,4 +12,12 @@ export class Utility{
         var range : number = Math.abs(upperBound - lowerBound);
         return Math.floor(Math.random() * range) + lowerBound;
     }
+
+    public static Sleep(miliseconds) {
+        var currentTime = new Date().getTime();
+
+        while (currentTime + miliseconds >= new Date().getTime()) {
+        }
+     }
+
 }

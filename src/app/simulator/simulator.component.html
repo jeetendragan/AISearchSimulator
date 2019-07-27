@@ -25,30 +25,36 @@
                 </mat-form-field>
             </div>
             <div>
-                <button mat-raised-button>
+                <button mat-raised-button (click)="runSimulator()">
                     Start simulation
                     <mat-icon>play_arrow</mat-icon>
                 </button>
+            </div>
+            <div>
+                <div *ngFor="let n of numbers">{{n}},</div>
             </div>
         </div>
         <div class="floatingMainMenu" fxLayout="column" *ngIf="activeObject != null && activeObject.type=='UIElementNode'">
             <div style="margin-bottom: 5px;">Node type: {{getNodeTypeAsString(activeObject)}} </div>
             <div style="margin-bottom: 5px;">
-                <button disabled="getNodeTypeAsString(activeObject) == 'Start'" 
+                <button
                     mat-raised-button 
-                    style="background-color: #0849A2; color: white;">
+                    style="background-color: #0849A2; color: white;"
+                    (click)="makeStartNode(activeObject)">
                     Make start state
                 </button>
             </div>
             <div style="margin-bottom: 5px;">
-                <button disabled="getNodeTypeAsString(activeObject) == 'Goal'" 
+                <button 
+                    (click)="makeGoalNode(activeObject)"
                     mat-raised-button style="background-color: #08A229; color: white;">
                     Make goal state
                 </button>
             </div>
             <div style="margin-bottom: 5px;">
-                <button disabled="getNodeTypeAsString(activeObject) == 'Intermediate' "
-                    mat-raised-button class="optionsButton" 
+                <button
+                    mat-raised-button class="optionsButton"
+                    (click)="makeIntermediateNode(activeObject)"
                     style="background-color: #FF5733; color: white">
                     Make intermediate state
                 </button>

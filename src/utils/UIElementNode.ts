@@ -31,22 +31,26 @@ export var UIElementNode = fabric.util.createClass(fabric.Circle, {
         {
             case NodeType.Goal:
             {
-                this.set("fill", '#08A229');
+                var color = NodeColorMapper.GetGoalNodeColor();
+                this.set("fill", color);
                 break;
             }
             case NodeType.Intermediate:
             {
-                this.set("fill", "#FF5733");
+                var intermediateNodeColor = NodeColorMapper.GetIntermediateNodeColor();
+                this.set("fill", intermediateNodeColor);
                 break;
             }
             case NodeType.Start:
             {
-                this.set("fill", "#0849A2");
+                var startNodeColor = NodeColorMapper.GetStartNodeColor();
+                this.set("fill", startNodeColor);
                 break;
             }
             default:
             {
-                this.set("fill", "#FF5733");
+                var intermediateNodeColor = NodeColorMapper.GetIntermediateNodeColor();
+                this.set("fill", intermediateNodeColor);
                 break;
             }
         }
@@ -77,8 +81,55 @@ export var UIElementNode = fabric.util.createClass(fabric.Circle, {
         ctx.fillStyle = '#FFFFFF';
         ctx.fillText("N-"+this.id, -10, 5);
         ctx.save();
-
         ctx.restore();
+
+        // var nodeState : NodeStateInSearch = this.nodeStateInSearch;
+        // switch(nodeState)
+        // {
+        //     case NodeStateInSearch.UNDEFINED:
+        //     {
+        //         this.set({
+        //             strokeWidth: 0,
+        //             dirty : true
+        //         });
+        //         break;
+        //     }
+        //     case NodeStateInSearch.CURRENT:
+        //     {
+        //         this.set({
+        //                 strokeWidth: 2,
+        //                 stroke : "#000000",
+        //                 dirty: true
+        //         });
+        //         break;
+        //     }
+        //     case NodeStateInSearch.NOT_VISITED:
+        //     {
+        //         this.set({
+        //             strokeWidth: 2,
+        //             stroke: '#696969',
+        //             dirty: true
+        //         });
+        //         break;
+        //     }
+        //     case NodeStateInSearch.NOT_VISITED:
+        //     {
+        //         this.set({
+        //             strokeWidth : 2,
+        //             stroke : "#FFFFFF",
+        //             dirty : true
+        //         });
+        //         break;
+        //     }
+        //     default:{
+        //         this.set({
+        //             strokeWidth : 2,
+        //             stroke : "#FFFFFF",
+        //             dirty : true
+        //         });
+        //         break;
+        //     }
+        // }
 
     }
 });
@@ -87,4 +138,25 @@ export enum NodeType{
     Start=1,
     Intermediate,
     Goal
+}
+
+export class NodeColorMapper{
+    private static COLOR_MAP = {
+        "Start" : "#0849A2",
+        "Goal" : "#08A229",
+        "Intermediate" : "#FF5733"
+    }
+
+    public static GetIntermediateNodeColor() : string{
+        return this.COLOR_MAP['Intermediate'];
+    }
+
+    public static GetGoalNodeColor() : string{
+        return this.COLOR_MAP['Goal'];
+    }
+
+    public static GetStartNodeColor() : string{
+        return this.COLOR_MAP['Start'];
+    }
+
 }
