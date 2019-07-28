@@ -1,92 +1,92 @@
-export class XY{
-    
+export class XY {
     public static BasisX = new XY(1, 0);
     public static BasisY = new XY(0, 1);
     public static BasisXY = new XY(1, 1);
 
-    public X : number;
-    public Y : number;
+    public X: number;
+    public Y: number;
 
-    constructor(X: number, Y:number){
+    static getDistanceBetween(edgeStart: XY, edgeEnd: XY): number {
+        const vec: XY = edgeStart.subtract(edgeEnd);
+        return vec.getLength();
+    }
+
+    constructor(X: number, Y: number) {
         this.X = X;
         this.Y = Y;
     }
 
-    public add(other:XY){
-        var newX = this.X + other.X;
-        var newY = this.Y + other.Y;
+    public add(other: XY) {
+        const newX = this.X + other.X;
+        const newY = this.Y + other.Y;
         return new XY(newX, newY);
     }
 
-    public subtract(other){
-        var newX = this.X - other.X;
-        var newY = this.Y - other.Y;
+    public subtract(other) {
+        const newX = this.X - other.X;
+        const newY = this.Y - other.Y;
         return new XY(newX, newY);
     }
 
-    public multiply(scalar){
-        var newX = this.X * scalar;
-        var newY = this.Y * scalar;
+    public multiply(scalar) {
+        const newX = this.X * scalar;
+        const newY = this.Y * scalar;
         return new XY(newX, newY);
-	}
-
-    public divide(scalar){
-        var newX = this.X / scalar;
-        var newY = this.Y / scalar;
-        return new XY(newX, newY);
-	}
-	
-    public toString(){
-        return "X: "+ this.X +", Y: "+ this.Y;
     }
 
-    public getPolarAngleInDegree(){
-        var angleInRadian = Math.atan2(this.Y, this.X);
-        var angleInDegree = angleInRadian * (180 / Math.PI);
+    public divide(scalar) {
+        const newX = this.X / scalar;
+        const newY = this.Y / scalar;
+        return new XY(newX, newY);
+    }
 
-        if (angleInDegree <= 0)
-        { //is negative or zero. 
-            if (Math.abs(angleInDegree) <= 5)
-            { // in this case the angle can be in the range -5 to +5. We set it to 0, this test case captures when the vector angle is very 
-                // close to 0. We need to set it to 0. 
+    public toString() {
+        return 'X: ' + this.X + ', Y: ' + this.Y;
+    }
+
+    public getPolarAngleInDegree() {
+        const angleInRadian = Math.atan2(this.Y, this.X);
+        let angleInDegree = angleInRadian * (180 / Math.PI);
+
+        if (angleInDegree <= 0) { // is negative or zero.
+            if (Math.abs(angleInDegree) <= 5) { // in this case the angle can be in the range -5 to +5. We set it to 0, this test case captures when the vector angle is very 
+                // close to 0. We need to set it to 0.
                 angleInDegree = 0;
-            }
-            else
-            { 
+            } else {
                 angleInDegree = 360 + angleInDegree;
             }
         }
         return angleInDegree;
     }
 
-    public dotProduct(other){
-        var dotProd = this.X*other.X + this.Y + other.Y;
+    public dotProduct(other: XY) {
+        return this.X * other.X + this.Y + other.Y;
     }
 
-    public isVectical(){
-        var polarAngle = this.getPolarAngleInDegree();
-        return ( 
+    public isVectical() {
+        const polarAngle = this.getPolarAngleInDegree();
+        return (
                 (Math.abs(polarAngle - 90) <= 3) ||
                 (Math.abs(polarAngle - 270) <= 3)
             );
     }
 
-    public crossProduct = function(other){
+    public crossProduct(other) {
         // cross product: we have two vectors, this and other. We need to find the cross product of this and other
-        // it will be equal to 
+        // it will be equal to
         // this.x * other.y - this.y * other.x
         return this.X * other.Y - this.Y * other.X;
     }
 
-    public getLength = function(){
+    public getLength() {
         return Math.sqrt(
             Math.pow(this.X, 2) + Math.pow(this.Y, 2)
         );
     }
 
-    public getUnitVector = function(){
-        var length = this.getLength();
-        var unitVector = this.divide(length);
+    public getUnitVector() {
+        const length = this.getLength();
+        const unitVector = this.divide(length);
         return unitVector;
     }
 }
