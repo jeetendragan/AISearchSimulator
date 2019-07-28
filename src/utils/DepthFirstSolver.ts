@@ -24,14 +24,6 @@ export class DepthFirstSolver {
             return result;
         }
 
-        // Highlight the current node
-        currentNode.set({
-            stroke : NodeStateInSearchColorMapper.GetColorForCurrentNode(),
-            dirty : true
-        });
-        simulatorInstance.canvas.requestRenderAll();
-        // Utility.Sleep(1000);
-
         // explore all the nodes that are connected to the currentNode
 
         const edgesAsSource: any[] = currentNode.asSource;
@@ -41,13 +33,6 @@ export class DepthFirstSolver {
             var edgeId = edgeIds[eKey];
             var nextEdge = simulatorInstance.getEdge(edgeId);
             var nextNode = nextEdge.destination;
-            currentNode.set(
-                {
-                    stroke : NodeStateInSearchColorMapper.GetColorForVisitedNode(),
-                    dirty : true
-                }
-            );
-            simulatorInstance.canvas.requestRenderAll();
 
             // Forward track
             nodesInSolution.push(nextNode);
@@ -61,17 +46,19 @@ export class DepthFirstSolver {
             // Backtrack
             nodesInSolution.pop();
             edgesInSolution.pop();
-
-            // Backtrack
-            currentNode.set({
-                stroke: NodeStateInSearchColorMapper.GetColorForCurrentNode(),
-                dirty: true
-            });
-            simulatorInstance.canvas.requestRenderAll();
         }
 
         result.solutionFound = false;
         result.message = 'Solution not found yet';
+
+        // mark the current node as visited
+        currentNode.set(
+            {
+                stroke : NodeStateInSearchColorMapper.GetColorForVisitedNode(),
+                dirty : true
+            }
+        );
+        simulatorInstance.canvas.requestRenderAll();
 
         return result;
     }
@@ -85,6 +72,7 @@ export class DepthFirstSolver {
             }
         }
 
+        const currentNode = currentState.currentNode;
         const connectedEdges = currentState.getNextEdges();
         const connectedEdgeIds = Object.keys(connectedEdges);
         for (const edgeId of connectedEdgeIds) {
@@ -99,7 +87,6 @@ export class DepthFirstSolver {
             const edgeStart: XY = new XY(nextEdge.x1, nextEdge.y1);
             const edgeEnd: XY = new XY(nextEdge.x2, nextEdge.y2);
             const edgeLength: number = XY.getDistanceBetween(edgeStart, edgeEnd);
-            const currentNode = currentState.currentNode;
 
             // forward track
             currentState.setCurrentNode(nextNode);
@@ -115,5 +102,14 @@ export class DepthFirstSolver {
             currentState.removeEdgeFromPath(nextEdge);
             currentState.deductCost(edgeLength);
         }
+
+        // mark the current node as visited
+        currentNode.set(
+            {
+                stroke : NodeStateInSearchColorMapper.GetColorForVisitedNode(),
+                dirty : true
+            }
+        );
+        simulatorInstance.canvas.requestRenderAll();
     }
 }
