@@ -1,0 +1,97 @@
+import { NodeStateInSearch } from './NodeStateInSearch';
+import { SimulatorComponent } from 'src/app/simulator/simulator.component';
+import { Queue } from './Queue';
+import { NodeType } from './UIElementNode';
+import { NodeStateInSearchColorMapper } from './NodeStateInSearchColorMapper';
+import { Solution } from './Solution';
+
+export class BreadthFirstSolver {
+
+    static Prepare(simulatorInstance: SimulatorComponent) {
+
+        Object.keys(simulatorInstance.nodes).forEach(nodeid => {
+            const node = simulatorInstance.nodes[nodeid];
+
+            // initialize the current cost to max(therotically, infinity)
+            node.cost = Number.MAX_VALUE;
+
+            // initialize the parent to null
+            node.parent = null;
+
+            // Mark if a node is visited
+            node.stateInSearch = NodeStateInSearch.NOT_VISITED;
+        });
+
+    }
+
+    static Solve(simulatorComponent: SimulatorComponent) {
+        BreadthFirstSolver.Prepare(simulatorComponent);
+
+        simulatorComponent.startNode.cost = 0; // the cost of the start node to itself will be zero
+        simulatorComponent.startNode.stateInSearch = NodeStateInSearch.CURRENT; // mark the startNode as current-i.e. it is being visited right now, and
+        // that some or all of its children are yet to be expanded
+
+        // For visual representation set the color as well
+        simulatorComponent.startNode.set({
+            stroke: NodeStateInSearchColorMapper.GetColorForCurrentNode(),
+            dirty: true
+        });
+
+        const queue: Queue<any> = new Queue<any>();
+        queue.enqueue(simulatorComponent.startNode);
+
+        while (!queue.isEmpty()) {
+            const currentNode = queue.dequeue();
+            const nodeType: NodeType = currentNode.nodeType;
+            if (nodeType === NodeType.Goal) {
+                // create a solution object and tranverse through all the parents of the GOAL NODE
+                const sol: Solution = new Solution(currentNode.cost);
+                let tempNode = currentNode;
+                while (tempNode != null) {
+                    sol.addNodeToPath(tempNode);
+                    // find the edge connecting tempNode and tempNode.parent
+                    if (tempNode.parent != null) {
+                        const edgeConnectingParent = tempNode.getEdgeConnectingNode(tempNode.parent);
+                        sol.addEdgeToPath(edgeConnectingParent);
+                    }
+
+                    tempNode = tempNode.parent;
+                }
+                return sol;
+            }
+
+            const edges = currentNode.asSource; // Get all the edges in which the node is a source
+            const edgeIds = Object.keys(edges);
+            for (const edgeId of edgeIds) {
+                const edge = edges[edgeId];
+                const nextNode = edge.destination;
+                if (nextNode.stateInSearch == NodeStateInSearch.NOT_VISITED) {
+                    // enque the node for expansion
+                    queue.enqueue(nextNode);
+
+                    // as the nextNode is one step away from the currentNode, just add 1 to the currentNode's path cost from source
+                    nextNode.cost = currentNode.cost + 1;
+
+                    // set the parent of the nextNode
+                    nextNode.parent = currentNode;
+
+                    // set the state of the nextNode to seen or current
+                    nextNode.stateInSearch = NodeStateInSearch.CURRENT;
+
+                    nextNode.set({
+                        stroke: NodeStateInSearchColorMapper.GetColorForCurrentNode(),
+                        dirty: true
+                    });
+                }
+            }
+
+            // after all the nodes of the current node are expanded, we set the current state to visited
+            currentNode.stateInSearch = NodeStateInSearch.VISITED;
+            currentNode.set({
+                stroke: NodeStateInSearchColorMapper.GetColorForVisitedNode(),
+                dirty: true
+            });
+        }
+
+    }
+}

@@ -1,3 +1,4 @@
+import { BreadthFirstSolver } from './BreadthFirstSolver';
 import { SimulatorComponent } from 'src/app/simulator/simulator.component';
 import { DepthFirstSolver } from './DepthFirstSolver';
 import { NodeStateInSearchColorMapper } from './NodeStateInSearchColorMapper';
@@ -13,30 +14,51 @@ export class SearchSolvers {
             message : ''
         }
 
-        if(Object.keys(simulatorInstance.nodes).length == 0){
+        if (Object.keys(simulatorInstance.nodes).length == 0) {
             result.isValid = false;
             result.message = 'Please add some nodes to the graph';
             return result;
         }
 
-        if(simulatorInstance.startNode != null && simulatorInstance.goalNode != null){
+        if (simulatorInstance.startNode != null && simulatorInstance.goalNode != null) {
             result.isValid = true;
             result.message = '';
-        }else if(simulatorInstance.startNode != null && simulatorInstance.goalNode == null){
+        } else if (simulatorInstance.startNode != null && simulatorInstance.goalNode == null) {
             result.isValid = false;
             result.message = 'Graph not valid: Goal is not defined.';
-        }else if(simulatorInstance.startNode == null && simulatorInstance.goalNode != null){
+        } else if (simulatorInstance.startNode == null && simulatorInstance.goalNode != null) {
             result.isValid = false;
             result.message = 'Graph not valid: Start node is not defined';
-        }else
-        {
+        } else {
             result.isValid = false;
             result.message = 'Graph not valid: Start, End nodes are not defined';
         }
         return result;
     }
 
-    static SolveByDepthFirst(simulatorInstance: SimulatorComponent, solveOptimally: boolean): any{
+    static SolveByBreadthFirst(simulatorComponent: SimulatorComponent) {
+
+        SearchSolvers.PrepareForSearch(simulatorComponent);
+        const solution: Solution = BreadthFirstSolver.Solve(simulatorComponent);
+        const nodeList: any = solution.getNodeListInPath();
+        nodeList.forEach(node => {
+            node.set({
+                stroke: '#00FF00',
+                dirty: true
+            });
+        });
+
+        const edgeList: any = solution.getEdgeListInPath();
+        edgeList.forEach(edge => {
+            edge.set({
+                stroke: '#00FF00',
+                dirty: true
+            });
+        });
+        simulatorComponent.canvas.requestRenderAll();
+    }
+
+    static SolveByDepthFirst(simulatorInstance: SimulatorComponent, solveOptimally: boolean): any {
 
         let result = {
             solutionFound : false,
@@ -56,14 +78,14 @@ export class SearchSolvers {
         const edges: any[] = bestSolution.getEdgeListInPath();
         const nodes: any[] = bestSolution.getNodeListInPath();
 
-        if(edges.length == 0){
+        if (edges.length == 0) {
             result.solutionFound = false;
-            result.message = "Could not find the solution";
+            result.message = 'Could not find the solution';
             return result;
         }
 
         result.solutionFound = true;
-        result.message = 'Best solution found with path cost: '+bestSolution.cost;
+        result.message = 'Best solution found with path cost: ' + bestSolution.cost;
 
         nodes.forEach(node => {
             node.set({
@@ -83,7 +105,7 @@ export class SearchSolvers {
         return result;
     }
 
-    static PrepareForSearch(simulatorInstance : SimulatorComponent){
+    static PrepareForSearch(simulatorInstance : SimulatorComponent) {
       let notVisitedNodeColor = NodeStateInSearchColorMapper.GetColorForNotVisitedNode();
       Object.keys(simulatorInstance.nodes).forEach(nodeid => {
           var node = simulatorInstance.nodes[nodeid];
