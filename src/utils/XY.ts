@@ -75,7 +75,7 @@ export class XY {
         // cross product: we have two vectors, this and other. We need to find the cross product of this and other
         // it will be equal to
         // this.x * other.y - this.y * other.x
-        return this.X * other.Y - this.Y * other.X;
+        return this.X * other.Y - this.Y * other.X; 
     }
 
     public getLength() {
