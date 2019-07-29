@@ -36,7 +36,7 @@ export class SearchSolvers {
         return result;
     }
 
-    static SolveByDepthFirst(simulatorInstance: SimulatorComponent, solveOptimally: boolean) {
+    static SolveByDepthFirst(simulatorInstance: SimulatorComponent, solveOptimally: boolean): any{
 
         let result = {
             solutionFound : false,
