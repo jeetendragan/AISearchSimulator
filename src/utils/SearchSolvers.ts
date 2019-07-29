@@ -36,32 +36,8 @@ export class SearchSolvers {
         return result;
     }
 
-    static SolveByDepthFirst(simulatorInstance: SimulatorComponent) : any{
-        SearchSolvers.PrepareForSearch(simulatorInstance);
-        var pathNodes = [];
-        pathNodes.push(simulatorInstance.startNode);
-        var pathEdges = [];
-        var result = DepthFirstSolver.Solve(simulatorInstance, simulatorInstance.startNode, pathNodes, pathEdges, 0);
-        pathNodes.forEach(node => {
-            node.set({
-                stroke: '#00FF00',
-                dirty: true
-            });
-        });
+    static SolveByDepthFirst(simulatorInstance: SimulatorComponent, solveOptimally: boolean) {
 
-        pathEdges.forEach(edge => {
-            edge.set({
-                stroke : '#00FF00',
-                dirty : true
-            });
-        });
-
-        simulatorInstance.canvas.requestRenderAll();
-        return result;
-    }
-
-    static SolveByDepthFirstOptimally(simulatorInstance: SimulatorComponent) {
-        
         let result = {
             solutionFound : false,
             message : ''
@@ -72,10 +48,10 @@ export class SearchSolvers {
         let currentSolution: Solution = new Solution(0);
         currentSolution.setCurrentNode(simulatorInstance.startNode);
         currentSolution.addNodeToPath(simulatorInstance.startNode);
-        
+
         let bestSolution: Solution = new Solution(Number.MAX_VALUE);
 
-        DepthFirstSolver.SolveOptimally(simulatorInstance, currentSolution, bestSolution);
+        DepthFirstSolver.Solve(simulatorInstance, currentSolution, bestSolution, solveOptimally);
 
         const edges: any[] = bestSolution.getEdgeListInPath();
         const nodes: any[] = bestSolution.getNodeListInPath();

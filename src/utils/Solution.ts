@@ -93,4 +93,8 @@ export class Solution {
         }
         return edgeList;
     }
+
+    public isSolutionFound() {
+        return (Object.keys(this.edgesInPath).length !== 0);
+    }
 }

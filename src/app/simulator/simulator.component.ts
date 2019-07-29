@@ -282,13 +282,13 @@ export class SimulatorComponent implements OnInit {
       }
       case this.algorithms[1]: {
         // depth first
-        const res = SearchSolvers.SolveByDepthFirst(this);
+        const res = SearchSolvers.SolveByDepthFirst(this, false);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[2]: {
         // depth-first(optimal)
-        const res = SearchSolvers.SolveByDepthFirstOptimally(this);
+        const res = SearchSolvers.SolveByDepthFirst(this, true);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
