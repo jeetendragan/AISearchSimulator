@@ -26,7 +26,7 @@ export class SimulatorComponent implements OnInit {
   public canvasElementWidth: number;
   public canvasElementHeight: number;
   public zoom: number;
-  public algorithms: string[] = ['Breadth first', 'Depth first', 'Depth first(Optimal)', 'A*'];
+  public algorithms: string[] = ['Breadth first', 'Uniform cost search', 'Depth first', 'Depth first(Optimal)', 'A*'];
   public selectedAlgorithm: string;
   public nodes: any = {};
   public edges: any = {};
@@ -42,7 +42,6 @@ export class SimulatorComponent implements OnInit {
   constructor(private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-
   }
 
   ngAfterViewInit() {

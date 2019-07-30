@@ -65,7 +65,7 @@ export class BreadthFirstSolver {
             for (const edgeId of edgeIds) {
                 const edge = edges[edgeId];
                 const nextNode = edge.destination;
-                if (nextNode.stateInSearch == NodeStateInSearch.NOT_VISITED) {
+                if (nextNode.stateInSearch === NodeStateInSearch.NOT_VISITED) {
                     // enque the node for expansion
                     queue.enqueue(nextNode);
 
