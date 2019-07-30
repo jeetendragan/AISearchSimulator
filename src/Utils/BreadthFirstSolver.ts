@@ -24,7 +24,7 @@ export class BreadthFirstSolver {
 
     }
 
-    static Solve(simulatorComponent: SimulatorComponent) {
+    static Solve(simulatorComponent: SimulatorComponent): Solution {
         BreadthFirstSolver.Prepare(simulatorComponent);
 
         simulatorComponent.startNode.cost = 0; // the cost of the start node to itself will be zero
@@ -93,5 +93,8 @@ export class BreadthFirstSolver {
             });
         }
 
+        // if the queue is empty and a solution is not found till now, then there is no 
+        // solution to the problem
+        return new Solution(Number.MAX_VALUE);
     }
 }

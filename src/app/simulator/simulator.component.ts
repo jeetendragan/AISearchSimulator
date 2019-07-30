@@ -36,7 +36,7 @@ export class SimulatorComponent implements OnInit {
   public tempEdge: any = null;
   public idGenerator: IdGenerator = new IdGenerator(Number.MAX_SAFE_INTEGER);
   public startNode: any = null;
-  public goalNode: any = null;
+  public goalNodes: any = {};
   public numbers: number[] = [];
 
   constructor(private snackBar: MatSnackBar) { }
@@ -282,18 +282,22 @@ export class SimulatorComponent implements OnInit {
         return;
       }
       case this.algorithms[1]: {
+        // Uniform cost search
+        return;
+      }
+      case this.algorithms[2]: {
         // depth first
         const res = SearchSolvers.SolveByDepthFirst(this, false);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
-      case this.algorithms[2]: {
+      case this.algorithms[3]: {
         // depth-first(optimal)
         const res = SearchSolvers.SolveByDepthFirst(this, true);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
-      case this.algorithms[3]: {
+      case this.algorithms[4]: {
         // A* search
         return;
       }
@@ -454,36 +458,26 @@ export class SimulatorComponent implements OnInit {
   }
 
   makeGoalNode(node: any) {
-    if (this.goalNode != null) {
-
-      this.goalNode.set({
-        fill : NodeColorMapper.GetIntermediateNodeColor(),
-        dirty : true,
-        nodeType : NodeType.Intermediate
-      });
-
+    if (this.goalNodes[node.id] !== undefined) {
+      return; // the node is already a goal node
     }
-
-    this.activeObject.set({
+    this.goalNodes[node.id] = node;
+    node.set({
       fill : NodeColorMapper.GetGoalNodeColor(),
       dirty : true,
       nodeType : NodeType.Goal
     });
-
-    this.goalNode = this.activeObject;
-
     this.canvas.requestRenderAll();
-
   }
 
   makeIntermediateNode(node: any) {
-    if (this.goalNode === node) {
-      this.goalNode.set({
+    if (this.isGoalNode(node)) {
+      node.set({
         fill : NodeColorMapper.GetIntermediateNodeColor(),
         dirty : true,
         nodeType : NodeType.Intermediate
       });
-      this.goalNode = null;
+      delete this.nodes[node.id];
     }
 
     if (this.startNode === node) {

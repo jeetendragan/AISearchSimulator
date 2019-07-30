@@ -12,21 +12,21 @@ export class SearchSolvers {
         let result = {
             isValid : false,
             message : ''
-        }
-
-        if (Object.keys(simulatorInstance.nodes).length == 0) {
+        };
+        debugger;
+        if (Object.keys(simulatorInstance.nodes).length === 0) {
             result.isValid = false;
             result.message = 'Please add some nodes to the graph';
             return result;
         }
 
-        if (simulatorInstance.startNode != null && simulatorInstance.goalNode != null) {
+        if (simulatorInstance.startNode != null && Object.keys(simulatorInstance.goalNodes).length !== 0) {
             result.isValid = true;
             result.message = '';
-        } else if (simulatorInstance.startNode != null && simulatorInstance.goalNode == null) {
+        } else if (simulatorInstance.startNode != null && Object.keys(simulatorInstance.goalNodes).length === 0) {
             result.isValid = false;
-            result.message = 'Graph not valid: Goal is not defined.';
-        } else if (simulatorInstance.startNode == null && simulatorInstance.goalNode != null) {
+            result.message = 'Graph not valid: Graph should have at least one goal node';
+        } else if (simulatorInstance.startNode == null && Object.keys(simulatorInstance.goalNodes).length !== 0) {
             result.isValid = false;
             result.message = 'Graph not valid: Start node is not defined';
         } else {
@@ -113,7 +113,7 @@ export class SearchSolvers {
         return result;
     }
 
-    static PrepareForSearch(simulatorInstance : SimulatorComponent) {
+    static PrepareForSearch(simulatorInstance: SimulatorComponent) {
       let notVisitedNodeColor = NodeStateInSearchColorMapper.GetColorForNotVisitedNode();
       Object.keys(simulatorInstance.nodes).forEach(nodeid => {
           var node = simulatorInstance.nodes[nodeid];
