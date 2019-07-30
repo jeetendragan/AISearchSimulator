@@ -48,7 +48,9 @@ export let UIElementEdge = fabric.util.createClass(fabric.Line, {
 
     // do not render if width/height are zeros or object is not visible
     // if (this.width === 0 || this.height === 0 || !this.visible) return;
-
+    ctx.font = '13px Lato';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(this.getCost(), 20, 20);
     ctx.save();
 
     const xDiff = this.x2 - this.x1;
@@ -62,16 +64,15 @@ export let UIElementEdge = fabric.util.createClass(fabric.Line, {
     ctx.closePath();
     ctx.fillStyle = this.stroke;
     ctx.fill();
-
     ctx.restore();
-
   },
 
   getCost(): number {
     const edgeStart: XY = new XY(this.x1, this.y1);
     const edgeEnd: XY = new XY(this.x2, this.y2);
     const edgeLength = XY.getDistanceBetween(edgeStart, edgeEnd);
-    return edgeLength * this.edgeWeight;
+    const cost = edgeLength * this.edgeWeight;
+    return Math.floor(cost * 1000) / 1000;
   }
 
 });

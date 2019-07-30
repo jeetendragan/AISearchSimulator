@@ -1,3 +1,4 @@
+import { BestFitSolver } from './BestFitSolver';
 import { BreadthFirstSolver } from './BreadthFirstSolver';
 import { SimulatorComponent } from 'src/app/simulator/simulator.component';
 import { DepthFirstSolver } from './DepthFirstSolver';
@@ -115,6 +116,40 @@ export class SearchSolvers {
         });
         simulatorInstance.canvas.requestRenderAll();
         
+        return result;
+    }
+
+    static SolveByBestFit(simulatorComponent: SimulatorComponent, isAStarSearch: boolean) {
+        SearchSolvers.PrepareForSearch(simulatorComponent);
+        let solution: Solution;
+        if (isAStarSearch) {
+             solution = BestFitSolver.Solve(simulatorComponent, true);
+        } else {
+            solution = BestFitSolver.Solve(simulatorComponent, false);
+        }
+
+        const solFound = solution.isSolutionFound();
+        const result = {
+            solutionFound: solFound,
+            message: solFound ? 'Solution found with a cost of: ' + solution.cost : 'Could not find the solution'
+        };
+
+        const nodeList: any = solution.getNodeListInPath();
+        nodeList.forEach(node => {
+            node.set({
+                stroke: '#00FF00',
+                dirty: true
+            });
+        });
+
+        const edgeList: any = solution.getEdgeListInPath();
+        edgeList.forEach(edge => {
+            edge.set({
+                stroke: '#00FF00',
+                dirty: true
+            });
+        });
+        simulatorComponent.canvas.requestRenderAll();
         return result;
     }
 

@@ -77,6 +77,9 @@ export let UIElementNode = fabric.util.createClass(fabric.Circle, {
         ctx.font = '13px Lato';
         ctx.fillStyle = '#FFFFFF';
         ctx.fillText('N-' + this.id, -10, 5);
+        if (this.visitOrder !== undefined) {
+            ctx.fillText('VO: ' + this.visitOrder, -10, 25);
+        }
         ctx.save();
         ctx.restore();
 
@@ -152,6 +155,12 @@ export let UIElementNode = fabric.util.createClass(fabric.Circle, {
         }
 
         return null;
+    },
+
+    getDistanceTo(otherNode: any): number {
+        const thisPos = new XY(this.left, this.top);
+        const otherPos = new XY(otherNode.left, otherNode.top);
+        return thisPos.distanceTo(otherPos);
     }
 });
 

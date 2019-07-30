@@ -89,4 +89,10 @@ export class XY {
         const unitVector = this.divide(length);
         return unitVector;
     }
+
+    distanceTo(other: XY): number {
+        const vector = this.subtract(other);
+        return vector.getLength();
+    }
+
 }

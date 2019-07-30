@@ -84,7 +84,7 @@ export class DepthFirstSolver {
         return {
             continueSearch: true,
             solutionFound: bestState.isSolutionFound(),
-            message: bestState.isSolutionFound() ? 'Best solution till now found with a cost of '+bestState.cost:'Best solution not found till now'
+            message: bestState.isSolutionFound() ? 'Best solution till now found with a cost of ' + bestState.cost : 'Best solution not found till now'
         };
     }
 }

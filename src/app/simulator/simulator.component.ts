@@ -26,7 +26,7 @@ export class SimulatorComponent implements OnInit {
   public canvasElementWidth: number;
   public canvasElementHeight: number;
   public zoom: number;
-  public algorithms: string[] = ['Breadth first', 'Uniform cost search', 'Depth first', 'Depth first(Optimal)', 'A*'];
+  public algorithms: string[] = ['Breadth first', 'Uniform cost search', 'Depth first', 'Depth first(Optimal)', 'Best-Fit (Greedy)', '(Best-Fit) A*'];
   public selectedAlgorithm: string;
   public nodes: any = {};
   public edges: any = {};
@@ -300,8 +300,15 @@ export class SimulatorComponent implements OnInit {
         return;
       }
       case this.algorithms[4]: {
-        // A* search
+        // greedy best fit
+        const res = SearchSolvers.SolveByBestFit(this, false);
+        this.snackBar.open(res.message, 'Okay!');
         return;
+      }
+      case this.algorithms[5]: {
+        const res = SearchSolvers.SolveByBestFit(this, true);
+        this.snackBar.open(res.message, 'Okay!');
+        // A* search
       }
     }
   }
@@ -506,6 +513,20 @@ export class SimulatorComponent implements OnInit {
 
   getEdge(edgeId: string) {
     return this.edges[edgeId];
+  }
+
+  distanceToNearestGoal(queryNode: any): number {
+    // iterate over all the goal nodes and return the distance that is closest to the queryNode
+    let closestDistance = Number.MAX_VALUE;
+    Object.keys(this.goalNodes).forEach(goalNodeId => {
+        const goalNode = this.goalNodes[goalNodeId];
+        const dist = goalNode.getDistanceTo(queryNode);
+        if (dist < closestDistance) {
+          closestDistance = dist;
+        }
+    });
+
+    return closestDistance;
   }
 
 }
