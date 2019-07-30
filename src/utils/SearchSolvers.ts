@@ -36,10 +36,17 @@ export class SearchSolvers {
         return result;
     }
 
-    static SolveByBreadthFirst(simulatorComponent: SimulatorComponent) {
+    static SolveByBreadthFirst(simulatorComponent: SimulatorComponent): any {
 
         SearchSolvers.PrepareForSearch(simulatorComponent);
         const solution: Solution = BreadthFirstSolver.Solve(simulatorComponent);
+
+        const solFound = solution.isSolutionFound();
+        const result = {
+            solutionFound: solFound,
+            message: solFound ? 'Solution found with a cost of: ' + solution.cost : 'Could not find the solution'
+        };
+
         const nodeList: any = solution.getNodeListInPath();
         nodeList.forEach(node => {
             node.set({
@@ -56,6 +63,7 @@ export class SearchSolvers {
             });
         });
         simulatorComponent.canvas.requestRenderAll();
+        return result;
     }
 
     static SolveByDepthFirst(simulatorInstance: SimulatorComponent, solveOptimally: boolean): any {
