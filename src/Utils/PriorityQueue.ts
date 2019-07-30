@@ -1,3 +1,4 @@
+import { IQueue } from './Queue';
 import BinaryHeapStrategy from './BinaryHeapStrategy';
 
 export type Comparator<T> = (a: T, b: T) => number;
@@ -8,13 +9,13 @@ export interface Options<T> {
 }
 
 export interface QueueStrategy<T> {
-    queue(value: T): void;
+    enqueue(value: T): void;
     dequeue(): T;
     peek(): T;
     clear(): void;
 }
 
-export class PriorityQueue<T> {
+export class PriorityQueue<T> implements IQueue<T> {
     private len = 0;
     public get length() { return this.len; }
 
@@ -25,9 +26,9 @@ export class PriorityQueue<T> {
         this.strategy = new BinaryHeapStrategy(options);
     }
 
-    public queue(value: T) {
+    public enqueue(value: T) {
         this.len++;
-        this.strategy.queue(value);
+        this.strategy.enqueue(value);
     }
 
     public dequeue() {
@@ -44,5 +45,9 @@ export class PriorityQueue<T> {
     public clear() {
         this.len = 0;
         this.strategy.clear();
+    }
+
+    public isEmpty(): boolean {
+        return this.len === 0;
     }
 }

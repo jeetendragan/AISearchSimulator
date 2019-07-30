@@ -1,3 +1,4 @@
+import { XY } from './XY';
 import 'fabric';
 declare let fabric;
 

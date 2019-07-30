@@ -36,10 +36,15 @@ export class SearchSolvers {
         return result;
     }
 
-    static SolveByBreadthFirst(simulatorComponent: SimulatorComponent): any {
+    static SolveByBreadthFirst(simulatorComponent: SimulatorComponent, uniformCostSearch: boolean): any {
 
         SearchSolvers.PrepareForSearch(simulatorComponent);
-        const solution: Solution = BreadthFirstSolver.Solve(simulatorComponent);
+        let solution: Solution;
+        if (uniformCostSearch) {
+             solution = BreadthFirstSolver.Solve(simulatorComponent, true);
+        } else {
+            solution = BreadthFirstSolver.Solve(simulatorComponent, false);
+        }
 
         const solFound = solution.isSolutionFound();
         const result = {

@@ -1,27 +1,39 @@
-export class Queue<T> {
+export interface IQueue<T> {
+    enqueue(item: T): void;
+    dequeue(): T;
+    peek(): T;
+    clear(): void;
+    isEmpty(): boolean;
+}
+
+export class Queue<T> implements IQueue<T> {
     queue: T[];
 
     constructor(queue?: T[]) {
         this.queue = queue || [];
     }
 
-    enqueue(item: T) {
+    public enqueue(item: T) {
         this.queue.push(item);
     }
 
-    dequeue(): T {
+    public dequeue(): T {
         return this.queue.shift();
     }
 
-    clear() {
+    public peek(): T {
+        return this.queue[0];
+    }
+
+    public clear() {
         this.queue = [];
     }
 
-    get count(): number {
+    public count(): number {
         return this.queue.length;
     }
 
     isEmpty(): boolean {
-        return(this.count === 0);
+        return(this.count() === 0);
     }
 }

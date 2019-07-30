@@ -1,9 +1,11 @@
 import { NodeStateInSearch } from './NodeStateInSearch';
 import { SimulatorComponent } from 'src/app/simulator/simulator.component';
-import { Queue } from './Queue';
+import { Queue, IQueue } from './Queue';
 import { NodeType } from './UIElementNode';
 import { NodeStateInSearchColorMapper } from './NodeStateInSearchColorMapper';
 import { Solution } from './Solution';
+import { PriorityQueue } from './PriorityQueue';
+import { Options } from './PriorityQueue';
 
 export class BreadthFirstSolver {
 
@@ -24,7 +26,7 @@ export class BreadthFirstSolver {
 
     }
 
-    static Solve(simulatorComponent: SimulatorComponent): Solution {
+    static Solve(simulatorComponent: SimulatorComponent, uniformCostSearch: boolean): Solution {
         BreadthFirstSolver.Prepare(simulatorComponent);
 
         simulatorComponent.startNode.cost = 0; // the cost of the start node to itself will be zero
@@ -37,7 +39,19 @@ export class BreadthFirstSolver {
             dirty: true
         });
 
-        const queue: Queue<any> = new Queue<any>();
+        let queue: IQueue<any>;
+        if (uniformCostSearch) {
+
+            const compareNodes = function(nodeA, nodeB) {
+                return nodeA.cost - nodeB.cost;
+            };
+
+            // use a priority queue if a uniform cost search is being used
+            queue = new PriorityQueue({ comparator: compareNodes });
+        } else {
+            queue = new Queue<any>(); // use a normal queue if normal BFS is to be used
+        }
+
         queue.enqueue(simulatorComponent.startNode);
 
         while (!queue.isEmpty()) {
@@ -66,11 +80,13 @@ export class BreadthFirstSolver {
                 const edge = edges[edgeId];
                 const nextNode = edge.destination;
                 if (nextNode.stateInSearch === NodeStateInSearch.NOT_VISITED) {
-                    // enque the node for expansion
-                    queue.enqueue(nextNode);
 
-                    // as the nextNode is one step away from the currentNode, just add 1 to the currentNode's path cost from source
-                    nextNode.cost = currentNode.cost + 1;
+                    if (uniformCostSearch) {
+                        nextNode.cost = currentNode.cost + edge.getCost();
+                    } else {
+                        // as the nextNode is one step away from the currentNode, just add 1 to the currentNode's path cost from source
+                        nextNode.cost = currentNode.cost + 1;
+                    }
 
                     // set the parent of the nextNode
                     nextNode.parent = currentNode;
@@ -82,6 +98,9 @@ export class BreadthFirstSolver {
                         stroke: NodeStateInSearchColorMapper.GetColorForCurrentNode(),
                         dirty: true
                     });
+
+                    // enque the node for expansion
+                    queue.enqueue(nextNode);
                 }
             }
 
@@ -93,7 +112,7 @@ export class BreadthFirstSolver {
             });
         }
 
-        // if the queue is empty and a solution is not found till now, then there is no 
+        // if the queue is empty and a solution is not found till now, then there is no
         // solution to the problem
         return new Solution(Number.MAX_VALUE);
     }

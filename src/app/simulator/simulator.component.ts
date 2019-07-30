@@ -277,12 +277,14 @@ export class SimulatorComponent implements OnInit {
     switch (this.selectedAlgorithm) {
       case this.algorithms[0]: {
         // breadth first
-        const res = SearchSolvers.SolveByBreadthFirst(this);
+        const res = SearchSolvers.SolveByBreadthFirst(this, false);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[1]: {
         // Uniform cost search
+        const res = SearchSolvers.SolveByBreadthFirst(this, true);
+        this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[2]: {
@@ -477,7 +479,7 @@ export class SimulatorComponent implements OnInit {
         dirty : true,
         nodeType : NodeType.Intermediate
       });
-      delete this.nodes[node.id];
+      delete this.goalNodes[node.id];
     }
 
     if (this.startNode === node) {

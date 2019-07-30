@@ -6,7 +6,6 @@ import { XY } from './XY';
 export class DepthFirstSolver {
 
     static Solve(simulatorInstance: SimulatorComponent, currentState: Solution, bestState: Solution, solveOptimally: boolean): any {
-        debugger;
 
         const currentNode = currentState.currentNode;
         // mark the current node as visited
@@ -55,15 +54,13 @@ export class DepthFirstSolver {
                 continue; // do not consider a node that has already been considered to avoid infinite loops
             }
 
-            const edgeStart: XY = new XY(nextEdge.x1, nextEdge.y1);
-            const edgeEnd: XY = new XY(nextEdge.x2, nextEdge.y2);
-            const edgeLength: number = XY.getDistanceBetween(edgeStart, edgeEnd);
+            const edgeCost = nextEdge.getCost();
 
             // forward track
             currentState.setCurrentNode(nextNode);
             currentState.addNodeToPath(nextNode);
             currentState.addEdgeToPath(nextEdge);
-            currentState.addCost(edgeLength);
+            currentState.addCost(edgeCost);
 
             const result = this.Solve(simulatorInstance, currentState, bestState, solveOptimally);
 
@@ -71,7 +68,7 @@ export class DepthFirstSolver {
             currentState.setCurrentNode(currentNode);
             currentState.removeNodeFromPath(nextNode);
             currentState.removeEdgeFromPath(nextEdge);
-            currentState.deductCost(edgeLength);
+            currentState.deductCost(edgeCost);
 
             if (!result.continueSearch) {
                 // if in any one of the child node expansion, continueSearch is set to false, further child exploration should be stopped.

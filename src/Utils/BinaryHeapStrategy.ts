@@ -19,7 +19,7 @@ export default class BinaryHeapStrategy<T> implements QueueStrategy<T> {
         }
     }
 
-    public queue(value: T) {
+    public enqueue(value: T) {
         this.data.push(value);
         this._bubbleUp(this.data.length - 1);
     }
