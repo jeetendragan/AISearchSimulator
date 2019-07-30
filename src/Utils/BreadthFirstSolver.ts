@@ -22,6 +22,8 @@ export class BreadthFirstSolver {
 
             // Mark if a node is visited
             node.stateInSearch = NodeStateInSearch.NOT_VISITED;
+
+            node.visitOrder = '';
         });
 
     }
@@ -29,9 +31,12 @@ export class BreadthFirstSolver {
     static Solve(simulatorComponent: SimulatorComponent, uniformCostSearch: boolean): Solution {
         BreadthFirstSolver.Prepare(simulatorComponent);
 
+        let visitOrder = 1;
+
         simulatorComponent.startNode.cost = 0; // the cost of the start node to itself will be zero
         simulatorComponent.startNode.stateInSearch = NodeStateInSearch.CURRENT; // mark the startNode as current-i.e. it is being visited right now, and
         // that some or all of its children are yet to be expanded
+        simulatorComponent.startNode.visitOrder = visitOrder;
 
         // For visual representation set the color as well
         simulatorComponent.startNode.set({
@@ -110,6 +115,7 @@ export class BreadthFirstSolver {
                 stroke: NodeStateInSearchColorMapper.GetColorForVisitedNode(),
                 dirty: true
             });
+            currentNode.visitOrder = visitOrder++;
         }
 
         // if the queue is empty and a solution is not found till now, then there is no
