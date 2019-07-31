@@ -1,4 +1,3 @@
-import 'fabric';
 import { Component, OnInit } from '@angular/core';
 import { XY } from '../../Utils/XY';
 import { UIElementNode, NodeType, NodeColorMapper } from '../../Utils/UIElementNode';
@@ -8,6 +7,7 @@ import { IdGenerator } from 'src/Utils/IdGenerator';
 import { SearchSolvers } from 'src/Utils/SearchSolvers';
 import { MatSnackBar } from '@angular/material';
 
+import 'fabric';
 declare let fabric;
 
 export enum CanvasState {
