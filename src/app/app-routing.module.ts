@@ -4,8 +4,8 @@ import { SimulatorComponent } from './simulator/simulator.component';
 
 const routes: Routes = [
   {
-    path:'',
-    component:SimulatorComponent
+    path: '',
+    component: SimulatorComponent
   }
 ];
 

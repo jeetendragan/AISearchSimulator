@@ -10,7 +10,8 @@
                     [style.color]="isLinkingEnabled ? '#FFFFFF':'#000000'" [style.backgroundColor]="isLinkingEnabled ? '#008000':'#FFFFFF'">
                     <mat-icon>call_made</mat-icon>
                 </button>
-                <button mat-icon-button class="optionsButton" matTooltip="How to use the simulator?" matTooltipPosition="below">
+                <button mat-icon-button class="optionsButton" matTooltip="How to use the simulator?" matTooltipPosition="below"
+                    (click)="showHelp()">
                     <mat-icon>help</mat-icon>
                 </button>
             </div>
@@ -65,22 +66,26 @@
         </div>
         <div class="uiUtilityMenu" fxLayout="column">
             <div>
-                <button mat-icon-button class="optionsButton" matTooltip="Zoom in" matTooltipPosition="below">
+                <button mat-icon-button class="optionsButton" matTooltip="Zoom in" matTooltipPosition="below"
+                    (click)="zoomIn()">
                     <mat-icon>zoom_in</mat-icon>
                 </button>
             </div>
             <div>
-                <button mat-icon-button class="optionsButton" matTooltip="Zoom out" matTooltipPosition="below">
+                <button mat-icon-button class="optionsButton" matTooltip="Zoom out" matTooltipPosition="below"
+                    (click)="zoomOut()">
                     <mat-icon>zoom_out</mat-icon>
                 </button>
             </div>
             <div>
-                <button mat-icon-button class="optionsButton" matTooltip="Fit to screen" matTooltipPosition="below">
+                <button mat-icon-button class="optionsButton" matTooltip="Fit to screen" matTooltipPosition="below"
+                    (click)="groupFocus()">
                     <mat-icon>center_focus_strong</mat-icon>
                 </button>
             </div>
             <div>
-                <button mat-icon-button class="optionsButton" matTooltip="Pan" matTooltipPosition="below" (click)="togglePan()" [style.color]=" isDragButtonEnabled ? 'black':'lightgrey'">
+                <button mat-icon-button class="optionsButton" matTooltip="Pan" matTooltipPosition="below" 
+                    (click)="togglePan()" [style.color]=" isDragButtonEnabled ? 'black':'lightgrey'">
                     <mat-icon>pan_tool</mat-icon>
                 </button>
             </div>

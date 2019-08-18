@@ -82,55 +82,6 @@ export let UIElementNode = fabric.util.createClass(fabric.Circle, {
         }
         ctx.save();
         ctx.restore();
-
-        // var nodeState : NodeStateInSearch = this.nodeStateInSearch;
-        // switch(nodeState)
-        // {
-        //     case NodeStateInSearch.UNDEFINED:
-        //     {
-        //         this.set({
-        //             strokeWidth: 0,
-        //             dirty : true
-        //         });
-        //         break;
-        //     }
-        //     case NodeStateInSearch.CURRENT:
-        //     {
-        //         this.set({
-        //                 strokeWidth: 2,
-        //                 stroke : "#000000",
-        //                 dirty: true
-        //         });
-        //         break;
-        //     }
-        //     case NodeStateInSearch.NOT_VISITED:
-        //     {
-        //         this.set({
-        //             strokeWidth: 2,
-        //             stroke: '#696969',
-        //             dirty: true
-        //         });
-        //         break;
-        //     }
-        //     case NodeStateInSearch.NOT_VISITED:
-        //     {
-        //         this.set({
-        //             strokeWidth : 2,
-        //             stroke : "#FFFFFF",
-        //             dirty : true
-        //         });
-        //         break;
-        //     }
-        //     default:{
-        //         this.set({
-        //             strokeWidth : 2,
-        //             stroke : "#FFFFFF",
-        //             dirty : true
-        //         });
-        //         break;
-        //     }
-        // }
-
     },
 
     getEdgeConnectingNode(otherNode): any {

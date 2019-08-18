@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { XY } from '../../Utils/XY';
 import { UIElementNode, NodeType, NodeColorMapper } from '../../Utils/UIElementNode';
 import { UIElementEdge } from '../../Utils/UIElementEdge';
@@ -6,6 +6,7 @@ import { Utility } from 'src/Utils/Utility';
 import { IdGenerator } from 'src/Utils/IdGenerator';
 import { SearchSolvers } from 'src/Utils/SearchSolvers';
 import { MatSnackBar } from '@angular/material';
+import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import 'fabric';
 declare let fabric;
@@ -39,7 +40,7 @@ export class SimulatorComponent implements OnInit {
   public goalNodes: any = {};
   public numbers: number[] = [];
 
-  constructor(private snackBar: MatSnackBar) { }
+  constructor(private snackBar: MatSnackBar, public dialog: MatDialog) { }
 
   ngOnInit() {
   }
@@ -447,6 +448,11 @@ export class SimulatorComponent implements OnInit {
   }
 
   makeStartNode(node: any) {
+
+    if (this.isGoalNode(node)) {
+      delete this.nodes[node.id];
+    }
+
     if (this.startNode != null) {
       this.startNode.set({
         fill : NodeColorMapper.GetIntermediateNodeColor(),
@@ -467,6 +473,7 @@ export class SimulatorComponent implements OnInit {
   }
 
   makeGoalNode(node: any) {
+    debugger;
     if (this.goalNodes[node.id] !== undefined) {
       return; // the node is already a goal node
     }
@@ -502,6 +509,137 @@ export class SimulatorComponent implements OnInit {
 
   }
 
+  zoomIn() {
+    let zoom = this.canvas.getZoom();
+    this.zoom = Math.round(zoom * 5) / 5;
+    console.log('Zoom: ' + zoom);
+    zoom = zoom + 0.01;
+
+    if (zoom > 20) { zoom = 20; }
+    if (zoom < 0.01) { zoom = 0.01; }
+
+    // get the centre of the screen
+    const screenCenter: XY = this.getScreenCenter();
+    this.canvas.zoomToPoint({ x: screenCenter.X, y: screenCenter.Y }, zoom); // point, zoom amount
+  }
+
+  zoomOut() {
+    let zoom = this.canvas.getZoom();
+    this.zoom = Math.round(zoom * 5) / 5;
+    console.log('Zoom: ' + zoom);
+    zoom = zoom - 0.01;
+
+    if (zoom > 20) { zoom = 20; }
+    if (zoom < 0.01) { zoom = 0.01; }
+
+    // get the centre of the screen
+    const screenCenter: XY = this.getScreenCenter();
+    this.canvas.zoomToPoint({ x: screenCenter.X, y: screenCenter.Y }, zoom); // point, zoom amount
+  }
+
+  groupFocus() {
+    const nodeIds = this.objectKeys(this.nodes);
+    let node = this.nodes[nodeIds[0]];
+
+    const nodeRadius = node.radius;
+
+    let leftMost = node.left - nodeRadius;
+    let rightMost = node.left + nodeRadius;
+    let topMost = node.top - nodeRadius;
+    let bottomMost = node.top + nodeRadius;
+    let currentFileLeftMost, currentFileRightMost, currentFileBottomMost, currentFileTopMost;
+    // get the bounding left, right, top and bottom coordinates
+    nodeIds.forEach(nodeId => {
+      node = this.nodes[nodeId];
+      currentFileLeftMost = node.left - nodeRadius;
+      currentFileRightMost = node.left + nodeRadius;
+      currentFileBottomMost = node.top + nodeRadius;
+      currentFileTopMost = node.top - nodeRadius;
+
+      if (currentFileLeftMost < leftMost) {
+        leftMost = currentFileLeftMost;
+      }
+      if (currentFileRightMost > rightMost) {
+        rightMost = currentFileRightMost;
+      }
+
+      if (currentFileBottomMost > bottomMost) {
+        bottomMost = currentFileBottomMost;
+      }
+      if (currentFileTopMost < topMost) {
+        topMost = currentFileTopMost;
+      }
+    });
+
+    // find the zoom level such that the focus area will fit
+    const focusWidth = Math.abs(rightMost - leftMost);
+    const focusHeight = Math.abs(topMost - bottomMost);
+
+    const widthMargin = this.canvasElementWidth * 5 / 100;
+    const heightMargin = this.canvasElementHeight * 5 / 100;
+
+    const widthZoom = (this.canvasElementWidth - widthMargin) / focusWidth;
+    const heightZoom = (this.canvasElementHeight - heightMargin) / focusHeight;
+    let zoom;
+
+    const heightAfterWidthZoom = focusHeight * widthZoom;
+    const widthAfterHeightZoom = focusWidth * heightZoom;
+
+    let widthZoomBool = false;
+    let heightZoomBool = false;
+    let noZoom = false;
+
+    if (heightAfterWidthZoom <= this.canvasElementHeight) {
+      zoom = widthZoom;
+      widthZoomBool = true;
+    } else {
+      if (widthAfterHeightZoom <= this.canvasElementWidth) {
+        zoom = heightZoom;
+        heightZoomBool = true;
+      } else {
+        noZoom = true;
+      }
+    }
+    if (noZoom === true) {
+      return;
+    }
+
+    // set the focus area
+    this.canvas.setZoom(zoom);
+    this.canvas.requestRenderAll();
+
+    // translate the canvas so that the focus area is the center of the screen
+    const viewPortTra = this.canvas.viewportTransform;
+
+    // // object center is in world coordinates
+    const focusCenterX = leftMost + focusWidth / 2;
+    const focusCenterY = topMost + focusHeight / 2;
+
+    // screen center, represents the screen coordinates on the screen, i.e. the center of the screen
+    const screenCenterX = this.canvasElementWidth / 2;
+    const screenCenterY = this.canvasElementHeight / 2;
+
+    // represents the real world coordinates
+    const screenCenterAsWorldUnitsX = (screenCenterX - viewPortTra[4]) * (1 / zoom);
+    const screenCenterAsWorldUnitsY = (screenCenterY - viewPortTra[5]) * (1 / zoom);
+
+    // // diff in screen and object centers
+    const xDiff = (focusCenterX - screenCenterAsWorldUnitsX);
+    const yDiff = (focusCenterY - screenCenterAsWorldUnitsY);
+
+    const translationXasScreenCoordinates = xDiff * (zoom);
+    const translationYasScreenCoordinates = yDiff * (zoom);
+
+    // translate the canvas
+    this.canvas.viewportTransform[4] = viewPortTra[4] - translationXasScreenCoordinates;
+    this.canvas.viewportTransform[5] = viewPortTra[5] - translationYasScreenCoordinates;
+    this.canvas.requestRenderAll();
+  }
+
+  showHelp() {
+    this.dialog.open(HelpDialogComponent);
+  }
+
   getDestinationNodesFor(currentNode: any): any[] {
     const destinationNodes = [];
     Object.keys(currentNode.asSource).forEach(edgeId => {
@@ -530,3 +668,13 @@ export class SimulatorComponent implements OnInit {
   }
 
 }
+
+@Component({
+  selector: 'app-help-dialog',
+  templateUrl: 'help-dialog.html'
+})
+export class HelpDialogComponent {
+  constructor() {}
+}
+
+
