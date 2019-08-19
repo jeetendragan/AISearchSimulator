@@ -1,5 +1,6 @@
 <h1 mat-dialog-title>Help Dialog</h1>
 <div mat-dialog-content>
+    <hr>
     <span>&#10003;</span> Create nodes by double clicking or by clicking the <mat-icon>scatter_plot</mat-icon> button.<br>
     <span>&#10003;</span> Create edge by selecting the <mat-icon>call_made</mat-icon> button, and then selecting the nodes.
     To unselect the start node, press ESC or click in empty space.<br>
@@ -8,4 +9,14 @@
     <span>&#10003;</span> Zoom in by clicking on the <mat-icon>zoom_in</mat-icon> button or scroll down.<br>
     <span>&#10003;</span> Zoom out by clicking on the <mat-icon>zoom_out</mat-icon> button or scroll up.<br>
     <span>&#10003;</span> Go into the pan state by clicking <mat-icon>pan_tool</mat-icon> button and then drag the canvas OR Drag the canvas by pressing ALT key.<br>
+    <br>
+    <hr>
+
+    Note
+    <ul>
+        <li>Nodes with a white border are unvisited.</li>
+        <li>Nodes with a black border are currently in the fringe.</li>
+        <li>Nodes with a yellow border have been visited.</li>
+    </ul>
+    
 </div>
