@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { XY } from '../../Utils/XY';
 import { UIElementNode, NodeType, NodeColorMapper } from '../../Utils/UIElementNode';
 import { UIElementEdge } from '../../Utils/UIElementEdge';
@@ -266,6 +266,19 @@ export class SimulatorComponent implements OnInit {
 
     });
 
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    console.log(event.target.innerWidth);
+    this.canvasElementWidth = event.target.innerWidth;
+    console.log(event.target.innerHeight);
+    this.canvasElementHeight = event.target.innerHeight;
+    this.canvas.set({
+      width : this.canvasElementWidth,
+      height : this.canvasElementHeight
+    });
+    this.groupFocus();
   }
 
   runSimulator() {
