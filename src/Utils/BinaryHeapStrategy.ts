@@ -81,4 +81,8 @@ export default class BinaryHeapStrategy<T> implements QueueStrategy<T> {
         }
         return void 0;
     }
+
+    public refreshQueueOrder() {
+        this._heapify();
+    }
 }

@@ -5,6 +5,7 @@ import { DepthFirstSolver } from './DepthFirstSolver';
 import { NodeStateInSearchColorMapper } from './NodeStateInSearchColorMapper';
 import { Utility } from './Utility';
 import { Solution } from './Solution';
+import { UniformCostSolver } from './UniformCostSolver';
 
 export class SearchSolvers {
 
@@ -37,16 +38,11 @@ export class SearchSolvers {
         return result;
     }
 
-    static SolveByBreadthFirst(simulatorComponent: SimulatorComponent, uniformCostSearch: boolean): any {
+    static SolveByBreadthFirst(simulatorComponent: SimulatorComponent): any {
 
         SearchSolvers.PrepareForSearch(simulatorComponent);
         let solution: Solution;
-        if (uniformCostSearch) {
-             solution = BreadthFirstSolver.Solve(simulatorComponent, true);
-        } else {
-            solution = BreadthFirstSolver.Solve(simulatorComponent, false);
-        }
-
+        solution = BreadthFirstSolver.Solve(simulatorComponent);
         const solFound = solution.isSolutionFound();
         const result = {
             solutionFound: solFound,
@@ -127,6 +123,37 @@ export class SearchSolvers {
         } else {
             solution = BestFitSolver.Solve(simulatorComponent, false);
         }
+
+        const solFound = solution.isSolutionFound();
+        const result = {
+            solutionFound: solFound,
+            message: solFound ? 'Solution found with a cost of: ' + solution.cost : 'Could not find the solution'
+        };
+
+        const nodeList: any = solution.getNodeListInPath();
+        nodeList.forEach(node => {
+            node.set({
+                stroke: '#00FF00',
+                dirty: true
+            });
+        });
+
+        const edgeList: any = solution.getEdgeListInPath();
+        edgeList.forEach(edge => {
+            edge.set({
+                stroke: '#00FF00',
+                dirty: true
+            });
+        });
+        simulatorComponent.canvas.requestRenderAll();
+        return result;
+    }
+
+    static SolveByUniformCostSearch(simulatorComponent: SimulatorComponent): any {
+        SearchSolvers.PrepareForSearch(simulatorComponent);
+        let solution: Solution;
+
+        solution = UniformCostSolver.Solve(simulatorComponent);
 
         const solFound = solution.isSolutionFound();
         const result = {

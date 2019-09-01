@@ -13,6 +13,7 @@ export interface QueueStrategy<T> {
     dequeue(): T;
     peek(): T;
     clear(): void;
+    refreshQueueOrder(): void;
 }
 
 export class PriorityQueue<T> implements IQueue<T> {
@@ -50,4 +51,11 @@ export class PriorityQueue<T> implements IQueue<T> {
     public isEmpty(): boolean {
         return this.len === 0;
     }
+
+    public heapify() {
+        this.strategy.refreshQueueOrder();
+    }
 }
+
+
+

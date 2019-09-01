@@ -1,14 +1,12 @@
+import { NodeType } from './UIElementNode';
+import { PriorityQueue } from './PriorityQueue';
+import { IQueue } from './Queue';
 import { NodeStateInSearch } from './NodeStateInSearch';
 import { SimulatorComponent } from 'src/app/simulator/simulator.component';
-import { Queue, IQueue } from './Queue';
-import { NodeType } from './UIElementNode';
-import { NodeStateInSearchColorMapper } from './NodeStateInSearchColorMapper';
 import { Solution } from './Solution';
-import { PriorityQueue } from './PriorityQueue';
-import { Options } from './PriorityQueue';
+import { NodeStateInSearchColorMapper } from './NodeStateInSearchColorMapper';
 
-export class BreadthFirstSolver {
-
+export class UniformCostSolver {
     static Prepare(simulatorInstance: SimulatorComponent) {
 
         Object.keys(simulatorInstance.nodes).forEach(nodeid => {
@@ -29,7 +27,7 @@ export class BreadthFirstSolver {
     }
 
     static Solve(simulatorComponent: SimulatorComponent): Solution {
-        BreadthFirstSolver.Prepare(simulatorComponent);
+        UniformCostSolver.Prepare(simulatorComponent);
 
         let visitOrder = 1;
 
@@ -44,8 +42,14 @@ export class BreadthFirstSolver {
             dirty: true
         });
 
-        let queue: IQueue<any>;
-        queue = new Queue<any>(); // use a normal queue if normal BFS is to be used
+        let queue: PriorityQueue<any>;
+
+        const compareNodes = function(nodeA, nodeB) {
+            return nodeA.cost - nodeB.cost;
+        };
+
+        // use a priority queue for uniform cost search
+        queue = new PriorityQueue({ comparator: compareNodes });
 
         queue.enqueue(simulatorComponent.startNode);
 
@@ -74,10 +78,11 @@ export class BreadthFirstSolver {
             for (const edgeId of edgeIds) {
                 const edge = edges[edgeId];
                 const nextNode = edge.destination;
-                if (nextNode.stateInSearch === NodeStateInSearch.NOT_VISITED) {
 
-                    // as the nextNode is one step away from the currentNode, just add 1 to the currentNode's path cost from source
-                    nextNode.cost = currentNode.cost + 1;
+
+                if (nextNode.stateInSearch === NodeStateInSearch.NOT_VISITED) {
+                    // the nextNode is being seen for the 1st time
+                    nextNode.cost = currentNode.cost + edge.getCost();
 
                     // set the parent of the nextNode
                     nextNode.parent = currentNode;
@@ -92,7 +97,21 @@ export class BreadthFirstSolver {
 
                     // enque the node for expansion
                     queue.enqueue(nextNode);
-                }
+                } else if (nextNode.stateInSearch === NodeStateInSearch.CURRENT) {
+                    // the nextNode has been seen before
+
+                    const newCost = currentNode.cost + edge.getCost();
+
+                    if (newCost < nextNode.cost) {
+                        // a better way to reach newNode has been seen
+                        nextNode.cost = newCost;
+
+                        nextNode.parent = currentNode;
+
+                        queue.heapify(); // refresh the queue order
+                    }
+
+                } // else if nextNode.stateInSearch === NodeStateInSearch.VISITED, it has been explored completely
             }
 
             // after all the nodes of the current node are expanded, we set the current state to visited
@@ -108,4 +127,5 @@ export class BreadthFirstSolver {
         // solution to the problem
         return new Solution(Number.MAX_VALUE);
     }
+
 }

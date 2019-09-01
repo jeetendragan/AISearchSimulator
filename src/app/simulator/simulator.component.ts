@@ -291,13 +291,13 @@ export class SimulatorComponent implements OnInit {
     switch (this.selectedAlgorithm) {
       case this.algorithms[0]: {
         // breadth first
-        const res = SearchSolvers.SolveByBreadthFirst(this, false);
+        const res = SearchSolvers.SolveByBreadthFirst(this);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[1]: {
         // Uniform cost search
-        const res = SearchSolvers.SolveByBreadthFirst(this, true);
+        const res = SearchSolvers.SolveByUniformCostSearch(this);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
