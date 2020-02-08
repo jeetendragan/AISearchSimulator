@@ -68,8 +68,8 @@ export let UIElementEdge = fabric.util.createClass(fabric.Line, {
       ctx.closePath();
       ctx.fillStyle = this.stroke;
       ctx.fill();
-      ctx.restore();
     }
+    ctx.restore();
   },
 
   getCost(): number {

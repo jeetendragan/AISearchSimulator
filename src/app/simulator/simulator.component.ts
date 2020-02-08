@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material';
 import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import 'fabric';
+import { GeneralAlgorithms } from 'src/Utils/GeneralAlgorithms';
 declare let fabric;
 
 export enum CanvasState {
@@ -22,18 +23,17 @@ export enum CanvasState {
   styleUrls: ['./simulator.component.css']
 })
 export class SimulatorComponent implements OnInit {
-
   public canvas;
   public canvasElementWidth: number;
   public canvasElementHeight: number;
   public zoom: number;
-  public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)'];
+  public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)', 'Check Bipartiteness'];
   public selectedAlgorithm: string
   ng;
   public nodes: any = {};
   public edges: any = {};
   public isLinkingEnabled = false;
-  public isLinkingBidirectional = false;
+  //public isLinkingBidirectional = false;
   public isDragButtonEnabled = false;
   public activeObject: any = null;
   public tempEdge: any = null;
@@ -85,10 +85,14 @@ export class SimulatorComponent implements OnInit {
       this.canvas.selection = true;
       this.canvas.mouseDown = false;
 
+      debugger;
       // Get the old selection
       const oldSelection = this.activeObject;
+      console.log(oldSelection);
+
       // Get the current selection
       this.activeObject = this.canvas.getActiveObject();
+      console.log(this.activeObject);
 
       if (this.isLinkingEnabled) {
 
@@ -113,10 +117,11 @@ export class SimulatorComponent implements OnInit {
                 id: rid,
                 source: oldSelection,
                 destination: this.activeObject,
-                isUndirected: this.isLinkingBidirectional
+                //isUndirected: this.isLinkingBidirectional
               }
             );
 
+            //this.registerNodeInEdge(edge, oldSelection, this.activeObject, this.isLinkingBidirectional);
             this.registerNodeInEdge(edge, oldSelection, this.activeObject);
 
           } else {
@@ -185,7 +190,7 @@ export class SimulatorComponent implements OnInit {
               stroke: '#959494',
               strokeWidth: 2,
               selectable: false,
-              isUndirected: this.isLinkingBidirectional
+              //isUndirected: this.isLinkingBidirectional
             }
           );
 
@@ -286,10 +291,13 @@ export class SimulatorComponent implements OnInit {
   }
 
   runSimulator() {
-    const result = SearchSolvers.ValidateGraph(this);
-    if (!result.isValid) {
-      this.snackBar.open(result.message, 'Got it!');
-      return;
+
+    if(this.selectedAlgorithm != this.algorithms[6]){
+      const result = SearchSolvers.ValidateGraph(this);
+      if (!result.isValid) {
+        this.snackBar.open(result.message, 'Got it!');
+        return;
+      }
     }
 
     switch (this.selectedAlgorithm) {
@@ -328,15 +336,27 @@ export class SimulatorComponent implements OnInit {
         this.snackBar.open(res.message, 'Okay!');
         // A* search
       }
+      case this.algorithms[6]:{
+        // Check if bipartite
+        const res = GeneralAlgorithms.CheckIfBipartite(this);
+        this.snackBar.open(res.message, "Okay");
+      }
     }
   }
 
   registerNodeInEdge(edge: any, oldSelection: any, currentSelection: any) {
+    //isLinkingBidirectional: boolean
+    
     this.canvas.add(edge);
     this.edges[edge.id] = edge;
     // add the edge in the asSource and asDestination members of the source and destination node
     oldSelection.asSource[edge.id] = edge;
     currentSelection.asDestination[edge.id] = edge;
+    
+    /*if(isLinkingBidirectional){
+      currentSelection.asSource[edge.id] = edge;
+      oldSelection.asDestination[edge.id] = edge;
+    }*/
     this.canvas.sendToBack(edge);
   }
 
@@ -405,7 +425,8 @@ export class SimulatorComponent implements OnInit {
   }
 
   toggleEdgeState() {
-    if(this.isLinkingEnabled){
+    this.isLinkingEnabled = !this.isLinkingEnabled;
+    /*if(this.isLinkingEnabled){
       if(this.isLinkingBidirectional){
         this.isLinkingBidirectional = false;
       }else{
@@ -414,10 +435,10 @@ export class SimulatorComponent implements OnInit {
     }else{
         this.isLinkingBidirectional = false;
         this.isLinkingEnabled = true;
-    }
+    }*/
   }
 
-  toggleUndirectedEdgeState() {
+  /*toggleUndirectedEdgeState() {
     if(this.isLinkingEnabled){
       if(this.isLinkingBidirectional){
         this.isLinkingEnabled = false;
@@ -429,7 +450,7 @@ export class SimulatorComponent implements OnInit {
       this.isLinkingEnabled = true;
       this.isLinkingBidirectional = true;
     }
-  }
+  }*/
 
   togglePan() {
     // debugger;
@@ -687,6 +708,31 @@ export class SimulatorComponent implements OnInit {
       destinationNodes.push(edge.destination);
     });
     return destinationNodes;
+  }
+
+  getSourceNodesFor(currentNode: any): any[] {
+    const sourceNodes = [];
+    Object.keys(currentNode.asDestination).forEach(edgeId => {
+      const edge = this.getEdge(edgeId);
+      sourceNodes.push(edge.source);
+    });
+    return sourceNodes;
+  }
+
+  getAllNeighbouringNodes(currentNode: any): any[] {
+    let sourceNodes = this.getSourceNodesFor(currentNode);
+    let destinationNodes = this.getDestinationNodesFor(currentNode);
+    let allNodes = []
+    
+    sourceNodes.forEach(element => {
+      allNodes.push(element);
+    });
+
+    destinationNodes.forEach(element => {
+      allNodes.push(element);
+    });
+
+    return allNodes;
   }
 
   getEdge(edgeId: string) {
