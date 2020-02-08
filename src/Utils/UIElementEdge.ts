@@ -23,6 +23,9 @@ export let UIElementEdge = fabric.util.createClass(fabric.Line, {
     // this decides the amount of weight to be given to the edge length
     this.set('edgeWeight', options.edgeWeight || 1);
 
+    // this decides if the edged is two way-i.e undirected or not
+    this.set('isUndirected', options.isUndirected || false);
+
     // these are the default properties
     this.set('stroke', '#FFF');
     this.set('fill', '#FFF');
@@ -53,18 +56,20 @@ export let UIElementEdge = fabric.util.createClass(fabric.Line, {
     ctx.fillText(this.getCost(), 20, 20);
     ctx.save();
 
-    const xDiff = this.x2 - this.x1;
-    const yDiff = this.y2 - this.y1;
-    const angle = Math.atan2(yDiff, xDiff);
-    ctx.rotate(angle);
-    ctx.beginPath();
-    ctx.moveTo(10, 0);
-    ctx.lineTo(-10, 8);
-    ctx.lineTo(-10, -8);
-    ctx.closePath();
-    ctx.fillStyle = this.stroke;
-    ctx.fill();
-    ctx.restore();
+    if(!this.isUndirected){
+      const xDiff = this.x2 - this.x1;
+      const yDiff = this.y2 - this.y1;
+      const angle = Math.atan2(yDiff, xDiff);
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.moveTo(10, 0);
+      ctx.lineTo(-10, 8);
+      ctx.lineTo(-10, -8);
+      ctx.closePath();
+      ctx.fillStyle = this.stroke;
+      ctx.fill();
+      ctx.restore();
+    }
   },
 
   getCost(): number {

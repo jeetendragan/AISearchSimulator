@@ -6,9 +6,13 @@
                 <button mat-icon-button class="optionsButton" matTooltip="Add node" matTooltipPosition="below" (click)="AddNode()">
                     <mat-icon>scatter_plot</mat-icon>
                 </button>
-                <button mat-icon-button (click)="toggleEdgeState()" class="optionsButton" matTooltip="Add Edge" matTooltipPosition="below"
-                    [style.color]="isLinkingEnabled ? '#FFFFFF':'#000000'" [style.backgroundColor]="isLinkingEnabled ? '#008000':'#FFFFFF'">
+                <button mat-icon-button (click)="toggleEdgeState()" class="optionsButton" matTooltip="Add Directed Edge" matTooltipPosition="below"
+                    [style.color]="isLinkingEnabled && !isLinkingBidirectional ? '#FFFFFF':'#000000'" [style.backgroundColor]="isLinkingEnabled && !isLinkingBidirectional ? '#008000':'#FFFFFF'">
                     <mat-icon>call_made</mat-icon>
+                </button>
+                <button mat-icon-button (click)="toggleUndirectedEdgeState()" class="optionsButton" matTooltip="Add Undirected Edge" matTooltipPosition="below"
+                    [style.color]="isLinkingBidirectional ? '#FFFFFF':'#000000'" [style.backgroundColor]="isLinkingBidirectional ? '#008000':'#FFFFFF'">
+                    <mat-icon>sync_alt</mat-icon>
                 </button>
                 <button mat-icon-button class="optionsButton" matTooltip="How to use the simulator?" matTooltipPosition="below"
                     (click)="showHelp()">

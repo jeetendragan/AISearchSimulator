@@ -28,10 +28,12 @@ export class SimulatorComponent implements OnInit {
   public canvasElementHeight: number;
   public zoom: number;
   public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)'];
-  public selectedAlgorithm: string;
+  public selectedAlgorithm: stri
+  ng;
   public nodes: any = {};
   public edges: any = {};
   public isLinkingEnabled = false;
+  public isLinkingBidirectional = false;
   public isDragButtonEnabled = false;
   public activeObject: any = null;
   public tempEdge: any = null;
@@ -110,7 +112,8 @@ export class SimulatorComponent implements OnInit {
               {
                 id: rid,
                 source: oldSelection,
-                destination: this.activeObject
+                destination: this.activeObject,
+                isUndirected: this.isLinkingBidirectional
               }
             );
 
@@ -181,7 +184,8 @@ export class SimulatorComponent implements OnInit {
               fill: '#959494',
               stroke: '#959494',
               strokeWidth: 2,
-              selectable: false
+              selectable: false,
+              isUndirected: this.isLinkingBidirectional
             }
           );
 
@@ -401,7 +405,30 @@ export class SimulatorComponent implements OnInit {
   }
 
   toggleEdgeState() {
-    this.isLinkingEnabled = !this.isLinkingEnabled;
+    if(this.isLinkingEnabled){
+      if(this.isLinkingBidirectional){
+        this.isLinkingBidirectional = false;
+      }else{
+        this.isLinkingEnabled = false;
+      }
+    }else{
+        this.isLinkingBidirectional = false;
+        this.isLinkingEnabled = true;
+    }
+  }
+
+  toggleUndirectedEdgeState() {
+    if(this.isLinkingEnabled){
+      if(this.isLinkingBidirectional){
+        this.isLinkingEnabled = false;
+        this.isLinkingBidirectional = false;
+      }else{
+        this.isLinkingBidirectional = true;
+      }
+    }else{
+      this.isLinkingEnabled = true;
+      this.isLinkingBidirectional = true;
+    }
   }
 
   togglePan() {
