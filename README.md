@@ -31,7 +31,7 @@ Here is the link to the project(https://ai-search-simulator.herokuapp.com)
 I think you get to build some important skills through the project
 - Algorithms - Since you are implementing algorithms, you are bound to improve your algorithmic skills.
 - Software engineering skills
-  - You will not be implementing algorithms that are de-coupled. All the algorithms use the currently implemented functionalities. When a new algorithm needs to be implemented, some old decision has to be undone to allow an easier implementation of the current algorithm. But this may change implementations of various other algorithms.
+  - You will not be implementing algorithms that are de-coupled. All the algorithms use the currently implemented functionalities. When a new algorithm needs to be implemented, some old decision has to be undone to allow an easier implementation of the current algorithm. But this may change implementations of various other algorithms. Reconsidering design decisions when a new feature is to be added is what makes software building fun.
   
 # AISearchSimulator
 
