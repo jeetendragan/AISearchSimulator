@@ -1,3 +1,11 @@
+This project started with the implementation of various search algorithms, but I wish to extend and add a lot more graph algorithms to the project. I think there is a lot of room for improvement in terms of ad. Some more features like showing the pseudocode can enhance the project. Looking forward to your contributions.
+
+This project started with the implementation of various search algorithms, but there is still a lot of improvement. Some areas that I wish to work on(or have contributors to work on) are
+- Adding more algorithms
+- Adding more features like showing pseudocode for the selected algorithm, etc.
+
+Looking forward to your contrinutions.
+
 # Run the project
 
 Here is the link to the project(https://ai-search-simulator.herokuapp.com)
