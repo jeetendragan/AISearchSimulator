@@ -28,7 +28,7 @@ export class SimulatorComponent implements OnInit {
   public canvasElementHeight: number;
   public zoom: number;
   public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)'];
-  public selectedAlgorithm: stri
+  public selectedAlgorithm: string
   ng;
   public nodes: any = {};
   public edges: any = {};
