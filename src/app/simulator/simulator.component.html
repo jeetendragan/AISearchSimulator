@@ -27,12 +27,16 @@
             </div>
             <div>
                 <button mat-raised-button (click)="runSimulator()">
-                    Start simulation
+                    Run algorithm
                     <mat-icon>play_arrow</mat-icon>
                 </button>
             </div>
             <div>
                 <div *ngFor="let n of numbers">{{n}},</div>
+            </div>
+            <div style="margin-top: 35px; border-top: 1px solid grey; padding-top: 10px; color: rgb(163, 16, 16); ">
+                Made by <a href="http://www.the-algoschool.com" target="_blank" style="color:#000; text-decoration: none;">The AlgoSchool</a><br>
+                Like the project? Contribute on <a href="http://www.the-algoschool.com" target="_blank" style="color:#000; text-decoration: none;">GitHub.</a>
             </div>
         </div>
         <div class="floatingMainMenu" fxLayout="column" *ngIf="activeObject != null && activeObject.type=='UIElementNode'">
