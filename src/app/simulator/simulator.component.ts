@@ -10,6 +10,7 @@ import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import 'fabric';
 import { GeneralAlgorithms } from 'src/Utils/GeneralAlgorithms';
+import { TopologicalSorting } from 'src/Utils/TopologicalSorting';
 declare let fabric;
 
 export enum CanvasState {
@@ -27,9 +28,8 @@ export class SimulatorComponent implements OnInit {
   public canvasElementWidth: number;
   public canvasElementHeight: number;
   public zoom: number;
-  public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)', 'Check Bipartiteness'];
-  public selectedAlgorithm: string
-  ng;
+  public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)', 'Check Bipartiteness', 'Topological Ordering'];
+  public selectedAlgorithm: string;
   public nodes: any = {};
   public edges: any = {};
   public isLinkingEnabled = false;
@@ -292,54 +292,91 @@ export class SimulatorComponent implements OnInit {
 
   runSimulator() {
 
-    if(this.selectedAlgorithm != this.algorithms[6]){
-      const result = SearchSolvers.ValidateGraph(this);
-      if (!result.isValid) {
-        this.snackBar.open(result.message, 'Got it!');
-        return;
-      }
-    }
-
     switch (this.selectedAlgorithm) {
       case this.algorithms[0]: {
         // breadth first
+
+        const result = SearchSolvers.ValidateGraph(this);
+        if (!result.isValid) {
+          this.snackBar.open(result.message, 'Got it!');
+          return;
+        }
+
         const res = SearchSolvers.SolveByBreadthFirst(this);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[1]: {
         // Uniform cost search
+
+        const result = SearchSolvers.ValidateGraph(this);
+        if (!result.isValid) {
+          this.snackBar.open(result.message, 'Got it!');
+          return;
+        }
+
         const res = SearchSolvers.SolveByUniformCostSearch(this);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[2]: {
         // depth first
+
+        const result = SearchSolvers.ValidateGraph(this);
+        if (!result.isValid) {
+          this.snackBar.open(result.message, 'Got it!');
+          return;
+        }
+
         const res = SearchSolvers.SolveByDepthFirst(this, false);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[3]: {
         // depth-first(optimal)
+
+        const result = SearchSolvers.ValidateGraph(this);
+        if (!result.isValid) {
+          this.snackBar.open(result.message, 'Got it!');
+          return;
+        }
+
         const res = SearchSolvers.SolveByDepthFirst(this, true);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[4]: {
         // greedy best fit
+
+        const result = SearchSolvers.ValidateGraph(this);
+        if (!result.isValid) {
+          this.snackBar.open(result.message, 'Got it!');
+          return;
+        }
+
         const res = SearchSolvers.SolveByBestFit(this, false);
         this.snackBar.open(res.message, 'Okay!');
         return;
       }
       case this.algorithms[5]: {
+        // A* search
+        const result = SearchSolvers.ValidateGraph(this);
+        if (!result.isValid) {
+          this.snackBar.open(result.message, 'Got it!');
+          return;
+        }
         const res = SearchSolvers.SolveByBestFit(this, true);
         this.snackBar.open(res.message, 'Okay!');
-        // A* search
       }
       case this.algorithms[6]:{
         // Check if bipartite
         const res = GeneralAlgorithms.CheckIfBipartite(this);
         this.snackBar.open(res.message, "Okay");
+      }
+      case this.algorithms[7]: {
+        // Topological ordering
+        const res = TopologicalSorting.Sort(this);
+        this.snackBar.open(res.message, "Okay!");
       }
     }
   }
@@ -589,6 +626,20 @@ export class SimulatorComponent implements OnInit {
     this.zoom = Math.round(zoom * 5) / 5;
     console.log('Zoom: ' + zoom);
     zoom = zoom - 0.01;
+
+    if (zoom > 20) { zoom = 20; }
+    if (zoom < 0.01) { zoom = 0.01; }
+
+    // get the centre of the screen
+    const screenCenter: XY = this.getScreenCenter();
+    this.canvas.zoomToPoint({ x: screenCenter.X, y: screenCenter.Y }, zoom); // point, zoom amount
+  }
+
+  zoomOutBy(zoomAmount){
+    let zoom = this.canvas.getZoom();
+    this.zoom = Math.round(zoom * 5) / 5;
+    console.log('Zoom: ' + zoom);
+    zoom = zoom - zoomAmount;
 
     if (zoom > 20) { zoom = 20; }
     if (zoom < 0.01) { zoom = 0.01; }
