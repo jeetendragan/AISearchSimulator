@@ -76,8 +76,8 @@ export class TopologicalSorting{
                 });
                 
             }
-            simulatorInstance.groupFocus();
             simulatorInstance.canvas.requestRenderAll();
+            simulatorInstance.groupFocus();
             simulatorInstance.zoomOutBy(0.3);
         }
 
@@ -86,7 +86,7 @@ export class TopologicalSorting{
             result['message'] = 'Topological ordering is not valid for the graph.'
         }else{
             result['message'] = 'Nodes have been sorted topologically from left ro right.'
-            result['message'] += ' They have been staggered for better edge visibility.'
+            result['message'] += ' They have been staggered randomly for better edge visibility.'
         }
 
         console.log(incomingEdges);
