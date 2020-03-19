@@ -85,8 +85,19 @@ export let UIElementNode = fabric.util.createClass(fabric.Circle, {
     },
 
     getEdgeConnectingNode(otherNode): any {
-        debugger;
-        // check if the otherNode is present in the as source and as destination of this node
+        /*
+        CASE 1:
+        If the otherNode is the destination of the edge connecting this and other node
+        i.e. configuration is like - this -> other
+        We will surely find as we are iterating over all the asSource edges
+
+        CASE 2:
+        If the otherNode is the source in the relationship
+        i.e. configuration is like - other -> this
+        Will surely find the node as we are iterating over all the asDestination edges
+        */
+
+        // CASE 1
         const asSourceEdgeIds = Object.keys(this.asSource);
         for (const edgeId of asSourceEdgeIds) {
             const edge = this.asSource[edgeId];
@@ -96,6 +107,7 @@ export let UIElementNode = fabric.util.createClass(fabric.Circle, {
             }
         }
 
+        // CASE 2
         const asDestinationEdgeIds = Object.keys(this.asDestination);
         for (const edgeId of asDestinationEdgeIds) {
             const edge = this.asDestination[edgeId];
@@ -112,6 +124,100 @@ export let UIElementNode = fabric.util.createClass(fabric.Circle, {
         const thisPos = new XY(this.left, this.top);
         const otherPos = new XY(otherNode.left, otherNode.top);
         return thisPos.distanceTo(otherPos);
+    },
+
+    getAllNeighbouringNodes(): any {
+        /*
+        How are neighbours collected?
+        When an edge is directed and the current node is the source, then the destination can be reached
+        hence is a valid neighbour.
+        When an edge is undirected and the current node is the source, then the destination can 
+        still be reached hence is a valid neighbour.
+        When an edge is directed and the current node is the destinatio, then the source cannot be reached
+        hence the source is not a valid neighbour.
+        When an edge is undirected and the current node is the destination, then the source can be 
+        reached, hence the source is a valid neighbour.
+        */
+
+        let neighbours = []
+
+        // Iterate over all the edges in which the node is a source
+        const asSourceEdgeIds = Object.keys(this.asSource);
+        for (const edgeId of asSourceEdgeIds) {
+            const edge = this.asSource[edgeId];
+            const node = edge.destination;
+            if(node.id != this.id){
+                neighbours.push(node);
+            }
+        }
+
+        const asDestinationEdgeIds = Object.keys(this.asDestination);
+        for (const edgeId of asDestinationEdgeIds) {
+            const edge = this.asDestination[edgeId];
+            if(edge.isUndirected){
+                const node = edge.source;
+                if(node.id != this.id){
+                    neighbours.push(node);
+                }
+            }
+        }
+
+        return neighbours;
+    },
+
+    getAllNeighbouringNodesWithCost(): any{
+        let neighbours = []
+        let costs = []
+
+        // Iterate over all the edges in which the node is a source
+        const asSourceEdgeIds = Object.keys(this.asSource);
+        for (const edgeId of asSourceEdgeIds) {
+            const edge = this.asSource[edgeId];
+            const node = edge.destination;
+            neighbours.push(node);
+            costs.push(edge.getCost());
+        }
+
+        const asDestinationEdgeIds = Object.keys(this.asDestination);
+        for (const edgeId of asDestinationEdgeIds) {
+            const edge = this.asDestination[edgeId];
+            if(edge.isUndirected){
+                const node = edge.source;
+                neighbours.push(node);
+                costs.push(edge.getCost());
+            }
+        }
+
+        return {'neighbours': neighbours, 'costs': costs};
+    },
+
+    getAllNeighbourData(): any{
+        let neighbours = []
+        let costs = []
+        let edges = []
+
+        // Iterate over all the edges in which the node is a source
+        const asSourceEdgeIds = Object.keys(this.asSource);
+        for (const edgeId of asSourceEdgeIds) {
+            const edge = this.asSource[edgeId];
+            const node = edge.destination;
+            neighbours.push(node);
+            costs.push(edge.getCost());
+            edges.push(edge);
+        }
+
+        const asDestinationEdgeIds = Object.keys(this.asDestination);
+        for (const edgeId of asDestinationEdgeIds) {
+            const edge = this.asDestination[edgeId];
+            if(edge.isUndirected){
+                const node = edge.source;
+                neighbours.push(node);
+                costs.push(edge.getCost());
+                edges.push(edge);
+            }
+        }
+
+        return {'neighbours': neighbours, 'costs': costs, 'edges': edges};
     }
 });
 

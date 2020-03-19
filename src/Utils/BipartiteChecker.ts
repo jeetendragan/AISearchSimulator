@@ -92,7 +92,7 @@ export class BipartiteChecker {
                 colorForNeighbours = 0;
             }
 
-            var neighbouringNodes = simulatorInstance.getAllNeighbouringNodes(topNode);
+            var neighbouringNodes = topNode.getAllNeighbouringNodes();
             
             for(let i = 0; i < neighbouringNodes.length; i++){
                 let adjNode = neighbouringNodes[i];

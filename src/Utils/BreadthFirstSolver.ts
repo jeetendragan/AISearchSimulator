@@ -69,11 +69,14 @@ export class BreadthFirstSolver {
                 return sol;
             }
 
-            const edges = currentNode.asSource; // Get all the edges in which the node is a source
-            const edgeIds = Object.keys(edges);
-            for (const edgeId of edgeIds) {
-                const edge = edges[edgeId];
-                const nextNode = edge.destination;
+            // Get all the neighbouring nodes
+            let neighbours = currentNode.getAllNeighbouringNodes();
+
+            // const edges = currentNode.asSource; // Get all the edges in which the node is a source
+            // const edgeIds = Object.keys(edges);
+            for (const nextNode of neighbours) {
+                // const edge = edges[edgeId];
+                //const nextNode = edge.destination;
                 if (nextNode.stateInSearch === NodeStateInSearch.NOT_VISITED) {
 
                     // as the nextNode is one step away from the currentNode, just add 1 to the currentNode's path cost from source

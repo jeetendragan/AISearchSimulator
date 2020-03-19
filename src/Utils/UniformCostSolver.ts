@@ -73,16 +73,20 @@ export class UniformCostSolver {
                 return sol;
             }
 
-            const edges = currentNode.asSource; // Get all the edges in which the node is a source
-            const edgeIds = Object.keys(edges);
-            for (const edgeId of edgeIds) {
-                const edge = edges[edgeId];
-                const nextNode = edge.destination;
-
+            // Get all the neighbouring nodes
+            let neighbourData = currentNode.getAllNeighbouringNodesWithCost();
+            let neighbours = neighbourData['neighbours'];
+            let costs = neighbourData['costs'];
+            //const edges = currentNode.asSource; // Get all the edges in which the node is a source
+            //const edgeIds = Object.keys(edges);
+            for (var i = 0; i < neighbours.length; i++) {
+                //const edge = edges[edgeId];
+                const nextNode = neighbours[i];
+                const cost = costs[i];
 
                 if (nextNode.stateInSearch === NodeStateInSearch.NOT_VISITED) {
                     // the nextNode is being seen for the 1st time
-                    nextNode.cost = currentNode.cost + edge.getCost();
+                    nextNode.cost = currentNode.cost + cost;
 
                     // set the parent of the nextNode
                     nextNode.parent = currentNode;
@@ -100,7 +104,7 @@ export class UniformCostSolver {
                 } else if (nextNode.stateInSearch === NodeStateInSearch.CURRENT) {
                     // the nextNode has been seen before
 
-                    const newCost = currentNode.cost + edge.getCost();
+                    const newCost = currentNode.cost + cost;
 
                     if (newCost < nextNode.cost) {
                         // a better way to reach newNode has been seen
