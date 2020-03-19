@@ -12,12 +12,13 @@ Currently the project has the following algorithm categories and sub-categories
   - Best fit Search
 - Other graph algorithms
   - Bipartite Graph Checker
+  - Topological sorting
   
 Other algorithms that can be added
 - Graph coloring
 - Connected components
 - Finding bridges in a graph
-- Topological sorting
+- ~~Topological sorting~~
 - Maximum flow
 - and a lot more....
 
