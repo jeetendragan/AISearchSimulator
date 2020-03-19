@@ -43,18 +43,23 @@ export class DepthFirstSolver {
             }
         }
 
-        const connectedEdges = currentState.getNextEdges();
-        const connectedEdgeIds = Object.keys(connectedEdges);
+        // const connectedEdges = currentState.getNextEdges();
+        // const connectedEdgeIds = Object.keys(connectedEdges);
 
-        for (const edgeId of connectedEdgeIds) {
-            const nextEdge = connectedEdges[edgeId];
-            const nextNode = nextEdge.destination;
+        let neighbourData = currentNode.getAllNeighbourData();
+        let neighbours = neighbourData['neighbours'];
+        let costs = neighbourData['costs'];
+        let edges = neighbourData['edges'];
+
+        for (var i = 0; i < neighbours.length; i++) {
+            // const nextEdge = connectedEdges[edgeId];
+            const nextNode = neighbours[i];
+            const edgeCost = costs[i];
+            const nextEdge = edges[i];
 
             if (currentState.isNodeConsideredInPath(nextNode)) {
                 continue; // do not consider a node that has already been considered to avoid infinite loops
             }
-
-            const edgeCost = nextEdge.getCost();
 
             // forward track
             currentState.setCurrentNode(nextNode);

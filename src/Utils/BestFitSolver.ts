@@ -84,14 +84,21 @@ export class BestFitSolver {
                 return sol;
             }
 
-            const edges = currentNode.asSource; // Get all the edges in which the node is a source
-            const edgeIds = Object.keys(edges);
-            for (const edgeId of edgeIds) {
-                const edge = edges[edgeId];
-                const nextNode = edge.destination;
+            // const edges = currentNode.asSource; // Get all the edges in which the node is a source
+            // const edgeIds = Object.keys(edges);
+
+            // Get all the neighbouring nodes
+            let neighbourData = currentNode.getAllNeighbouringNodesWithCost();
+            let neighbours = neighbourData['neighbours'];
+            let costs = neighbourData['costs'];
+
+            for (var i = 0; i < neighbours.length; i++) {
+                // const edge = edges[edgeId];
+                const nextNode = neighbours[i];
+                const cost = costs[i];
                 if (nextNode.stateInSearch === NodeStateInSearch.NOT_VISITED) {
 
-                    nextNode.pathCost = currentNode.pathCost + edge.getCost();
+                    nextNode.pathCost = currentNode.pathCost + cost;
 
                     if (weighDistanceToSource) {
                         // for A*, the cost will be the path cost + the heurestic estimate from nextNode to the closest goal

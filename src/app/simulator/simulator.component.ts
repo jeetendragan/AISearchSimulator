@@ -33,7 +33,7 @@ export class SimulatorComponent implements OnInit {
   public nodes: any = {};
   public edges: any = {};
   public isLinkingEnabled = false;
-  //public isLinkingBidirectional = false;
+  public isLinkingBidirectional = false;
   public isDragButtonEnabled = false;
   public activeObject: any = null;
   public tempEdge: any = null;
@@ -94,7 +94,7 @@ export class SimulatorComponent implements OnInit {
       this.activeObject = this.canvas.getActiveObject();
       console.log(this.activeObject);
 
-      if (this.isLinkingEnabled) {
+      if (this.isLinkingEnabled || this.isLinkingBidirectional) {
 
         if (oldSelection != null && this.activeObject != null) {
 
@@ -117,12 +117,12 @@ export class SimulatorComponent implements OnInit {
                 id: rid,
                 source: oldSelection,
                 destination: this.activeObject,
-                //isUndirected: this.isLinkingBidirectional
+                isUndirected: this.isLinkingBidirectional
               }
             );
 
-            //this.registerNodeInEdge(edge, oldSelection, this.activeObject, this.isLinkingBidirectional);
-            this.registerNodeInEdge(edge, oldSelection, this.activeObject);
+            this.registerNodeInEdge(edge, oldSelection, this.activeObject, this.isLinkingBidirectional);
+            // this.registerNodeInEdge(edge, oldSelection, this.activeObject);
 
           } else {
             console.log('Same selection');
@@ -174,7 +174,7 @@ export class SimulatorComponent implements OnInit {
       }
 
       // **START** draw a temporary arrow (rep. an edge) for visual feedback******//
-      if (this.isLinkingEnabled && this.activeObject != null) {
+      if ((this.isLinkingEnabled || this.isLinkingBidirectional )&& this.activeObject != null) {
 
         // draw an edge from the selected item to the current mouse location
 
@@ -190,7 +190,7 @@ export class SimulatorComponent implements OnInit {
               stroke: '#959494',
               strokeWidth: 2,
               selectable: false,
-              //isUndirected: this.isLinkingBidirectional
+              isUndirected: this.isLinkingBidirectional
             }
           );
 
@@ -211,21 +211,28 @@ export class SimulatorComponent implements OnInit {
         // iterate over all the asSource edges
         this.objectKeys(currentSelection.asSource).forEach(edgeKey => {
           edge = currentSelection.asSource[edgeKey];
-          edge.set({
-            x1: currentSelection.left,
-            y1: currentSelection.top,
-            dirty: true
-          });
+          // When a user draws an arrow, even though the edge is undirected, we 
+          // store the source and destination. Which will help us set the coordinates
+          // of the edge correctly depending on the node(source/destination) being moved
+          if(edge.source.id == currentSelection.id){
+            edge.set({
+              x1: currentSelection.left,
+              y1: currentSelection.top,
+              dirty: true
+            });
+          }
         });
 
         // iterate over all the asDestination edges
         this.objectKeys(currentSelection.asDestination).forEach(edgeKey => {
           edge = currentSelection.asDestination[edgeKey];
-          edge.set({
-            x2: currentSelection.left,
-            y2: currentSelection.top,
-            dirty: true
-          });
+          if(edge.destination.id == currentSelection.id){
+            edge.set({
+              x2: currentSelection.left,
+              y2: currentSelection.top,
+              dirty: true
+            });
+          }
         });
 
         // render dirty members on the canavs
@@ -261,7 +268,7 @@ export class SimulatorComponent implements OnInit {
         // Implement code to delete an edge or a node
       }
 
-      if (event.key === 'Escape' && this.isLinkingEnabled) {
+      if (event.key === 'Escape' && (this.isLinkingEnabled || this.isLinkingBidirectional)) {
         // if esacpe has been clicked and we are in the linking state
         // deactivate an object that may have been active
         this.canvas.discardActiveObject();
@@ -353,7 +360,6 @@ export class SimulatorComponent implements OnInit {
           this.snackBar.open(result.message, 'Got it!');
           return;
         }
-
         const res = SearchSolvers.SolveByBestFit(this, false);
         this.snackBar.open(res.message, 'Okay!');
         return;
@@ -367,21 +373,25 @@ export class SimulatorComponent implements OnInit {
         }
         const res = SearchSolvers.SolveByBestFit(this, true);
         this.snackBar.open(res.message, 'Okay!');
+        return;
       }
       case this.algorithms[6]:{
         // Check if bipartite
         const res = GeneralAlgorithms.CheckIfBipartite(this);
         this.snackBar.open(res.message, "Okay");
+        return;
       }
       case this.algorithms[7]: {
         // Topological ordering
         const res = TopologicalSorting.Sort(this);
         this.snackBar.open(res.message, "Okay!");
+        return;
       }
     }
   }
 
-  registerNodeInEdge(edge: any, oldSelection: any, currentSelection: any) {
+  registerNodeInEdge(edge: any, oldSelection: any, currentSelection: any, 
+    isLinkingBidirectional: boolean) {
     //isLinkingBidirectional: boolean
     
     this.canvas.add(edge);
@@ -390,10 +400,10 @@ export class SimulatorComponent implements OnInit {
     oldSelection.asSource[edge.id] = edge;
     currentSelection.asDestination[edge.id] = edge;
     
-    /*if(isLinkingBidirectional){
+    if(isLinkingBidirectional){
       currentSelection.asSource[edge.id] = edge;
       oldSelection.asDestination[edge.id] = edge;
-    }*/
+    }
     this.canvas.sendToBack(edge);
   }
 
@@ -463,6 +473,8 @@ export class SimulatorComponent implements OnInit {
 
   toggleEdgeState() {
     this.isLinkingEnabled = !this.isLinkingEnabled;
+    this.isLinkingBidirectional = false;
+    // this.isLinkingEnabled = !this.isLinkingEnabled;
     /*if(this.isLinkingEnabled){
       if(this.isLinkingBidirectional){
         this.isLinkingBidirectional = false;
@@ -475,8 +487,10 @@ export class SimulatorComponent implements OnInit {
     }*/
   }
 
-  /*toggleUndirectedEdgeState() {
-    if(this.isLinkingEnabled){
+  toggleUndirectedEdgeState() {
+    this.isLinkingBidirectional = !this.isLinkingBidirectional;
+    this.isLinkingEnabled = false;
+    /*if(this.isLinkingEnabled){
       if(this.isLinkingBidirectional){
         this.isLinkingEnabled = false;
         this.isLinkingBidirectional = false;
@@ -486,8 +500,8 @@ export class SimulatorComponent implements OnInit {
     }else{
       this.isLinkingEnabled = true;
       this.isLinkingBidirectional = true;
-    }
-  }*/
+    }*/
+  }
 
   togglePan() {
     // debugger;

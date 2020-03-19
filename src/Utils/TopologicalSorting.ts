@@ -78,7 +78,7 @@ export class TopologicalSorting{
             }
             simulatorInstance.canvas.requestRenderAll();
             simulatorInstance.groupFocus();
-            simulatorInstance.zoomOutBy(0.3);
+            simulatorInstance.zoomOutBy(0.4);
         }
 
         let result = {};
