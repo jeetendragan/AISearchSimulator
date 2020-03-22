@@ -11,6 +11,7 @@ import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import 'fabric';
 import { GeneralAlgorithms } from 'src/Utils/GeneralAlgorithms';
 import { TopologicalSorting } from 'src/Utils/TopologicalSorting';
+import { GraphBridges } from 'src/Utils/GraphBridges';
 declare let fabric;
 
 export enum CanvasState {
@@ -28,7 +29,7 @@ export class SimulatorComponent implements OnInit {
   public canvasElementWidth: number;
   public canvasElementHeight: number;
   public zoom: number;
-  public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)', 'Check Bipartiteness', 'Topological Ordering'];
+  public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)', 'Check Bipartiteness', 'Topological Ordering', 'Find Bridges(Undirected graph)'];
   public selectedAlgorithm: string;
   public nodes: any = {};
   public edges: any = {};
@@ -384,6 +385,12 @@ export class SimulatorComponent implements OnInit {
       case this.algorithms[7]: {
         // Topological ordering
         const res = TopologicalSorting.Sort(this);
+        this.snackBar.open(res.message, "Okay!");
+        return;
+      }
+      case this.algorithms[8]:{
+        // Find Bridges(Undirected graph)
+        const res = GraphBridges.Identify(this);
         this.snackBar.open(res.message, "Okay!");
         return;
       }
