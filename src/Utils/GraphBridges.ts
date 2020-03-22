@@ -6,6 +6,7 @@ import { NodeStateInSearchColorMapper } from './NodeStateInSearchColorMapper';
 import { Solution } from './Solution';
 import { PriorityQueue } from './PriorityQueue';
 import { Options } from './PriorityQueue';
+import { SearchSolvers } from './SearchSolvers';
 
 export class GraphBridges {
 
@@ -27,6 +28,7 @@ export class GraphBridges {
 
     static Identify(simulatorComponent: SimulatorComponent): any {
         GraphBridges.Prepare(simulatorComponent);
+        SearchSolvers.PrepareForSearch(simulatorComponent);
         let allBridges = []
 
         let nodeList: any[] = [];
