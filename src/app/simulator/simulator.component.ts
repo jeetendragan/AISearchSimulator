@@ -6,7 +6,7 @@ import { Utility } from 'src/Utils/Utility';
 import { IdGenerator } from 'src/Utils/IdGenerator';
 import { SearchSolvers } from 'src/Utils/SearchSolvers';
 import { MatSnackBar } from '@angular/material';
-import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import 'fabric';
 import { GeneralAlgorithms } from 'src/Utils/GeneralAlgorithms';
@@ -46,6 +46,28 @@ export class SimulatorComponent implements OnInit {
   constructor(private snackBar: MatSnackBar, public dialog: MatDialog) { }
 
   ngOnInit() {
+  }
+
+  clearAll() {
+    let nodeIds = Object.keys(this.nodes);
+    for(var i = 0; i < nodeIds.length; i++){
+      this.canvas.remove(this.nodes[nodeIds[i]]);
+    }
+    this.nodes = {}
+
+    let edgeIds = Object.keys(this.edges);
+    for(var i = 0; i < edgeIds.length; i++){
+      this.canvas.remove(this.edges[edgeIds[i]]);
+    }
+    this.edges = {}
+
+    this.activeObject = null;
+
+    this.startNode = null;
+    this.goalNodes = {};
+    this.numbers = [];
+    this.idGenerator = new IdGenerator(Number.MAX_SAFE_INTEGER);
+
   }
 
   ngAfterViewInit() {
