@@ -4,6 +4,9 @@
         <div class="floatingMainMenu" fxLayout="column" *ngIf="activeObject == null">
             <div fxLayout="row">
                 <button mat-icon-button class="optionsButton" matTooltip="Add node" matTooltipPosition="below" (click)="AddNode()">
+                    <mat-icon>fiber_manual_record</mat-icon>
+                </button>
+                <button mat-icon-button class="optionsButton" matTooltip="Add nodes randomly" matTooltipPosition="below" (click)="AddRandomNodes()">
                     <mat-icon>scatter_plot</mat-icon>
                 </button>
                 <button mat-icon-button (click)="toggleEdgeState()" class="optionsButton" matTooltip="Add Directed Edge" matTooltipPosition="below"

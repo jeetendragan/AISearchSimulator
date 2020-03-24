@@ -462,6 +462,29 @@ export class SimulatorComponent implements OnInit {
     this.createNewNodeAt(newNodePos);
   }
 
+  AddNodeInBox(boxMin, boxMax){
+    // generate a random point within a box in the centre of the screen
+    const newNodePos: XY = Utility.GenerateRandomPointInBox(boxMin, boxMax);
+    this.createNewNodeAt(newNodePos);
+  }
+
+  AddRandomNodes(){
+
+    let nodeCount = Utility.GenerateRandomNumberBetween(3, 8);
+
+    // Get the center of the screen (in screen coordinates)
+    const screenCenter: XY = this.getScreenCenter();
+    const screenCenterInCanvasSystem: XY = this.transformScreenToCanvas(screenCenter);
+    // debugger;
+    const boxMin = screenCenterInCanvasSystem.add(XY.BasisXY.multiply(-1 * 250));
+    const boxMax = screenCenterInCanvasSystem.add(XY.BasisXY.multiply(250));
+
+    for(var i = 1; i <= nodeCount; i++){
+      this.AddNodeInBox(boxMin, boxMax);
+    }
+
+  }
+
   transformScreenToCanvas(pointInScreenSystem: XY): XY {
     let pointInCanvasSystem: XY;
 
