@@ -60,7 +60,7 @@ export class ConvexHull {
         simulatorInstance.canvas.requestRenderAll();
 
         return {
-            'message': 'Cross-prod found'
+            'message': 'Convex-hull found!'
         }
     }
 
