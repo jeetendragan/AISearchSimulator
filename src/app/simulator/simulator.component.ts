@@ -50,25 +50,29 @@ export class SimulatorComponent implements OnInit {
   }
 
   clearAll() {
+    this.deleteAllNodes();
+    this.deleteAllEdges();
+    this.activeObject = null;
+    this.startNode = null;
+    this.goalNodes = {};
+    this.numbers = [];
+    this.idGenerator = new IdGenerator(Number.MAX_SAFE_INTEGER);
+  }
+
+  deleteAllNodes(){
     let nodeIds = Object.keys(this.nodes);
     for(var i = 0; i < nodeIds.length; i++){
       this.canvas.remove(this.nodes[nodeIds[i]]);
     }
     this.nodes = {}
+  }
 
+  deleteAllEdges() {
     let edgeIds = Object.keys(this.edges);
     for(var i = 0; i < edgeIds.length; i++){
       this.canvas.remove(this.edges[edgeIds[i]]);
     }
     this.edges = {}
-
-    this.activeObject = null;
-
-    this.startNode = null;
-    this.goalNodes = {};
-    this.numbers = [];
-    this.idGenerator = new IdGenerator(Number.MAX_SAFE_INTEGER);
-
   }
 
   ngAfterViewInit() {

@@ -15,6 +15,8 @@ export class ConvexHull {
         
         debugger;
 
+        simulatorInstance.deleteAllEdges();
+
         let nodeIds = Object.keys(simulatorInstance.nodes)
         let nodes = []
         let leftMostPoint = null
