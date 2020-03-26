@@ -13,6 +13,7 @@ Currently the project has the following algorithm categories and sub-categories
 - Other graph algorithms
   - Bipartite Graph Checker
   - Topological sorting
+  - Convex hull
   
 Other algorithms that can be added
 - Graph coloring

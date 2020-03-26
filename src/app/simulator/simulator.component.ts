@@ -6,12 +6,13 @@ import { Utility } from 'src/Utils/Utility';
 import { IdGenerator } from 'src/Utils/IdGenerator';
 import { SearchSolvers } from 'src/Utils/SearchSolvers';
 import { MatSnackBar } from '@angular/material';
-import { MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatDialog} from '@angular/material/dialog';
 
 import 'fabric';
 import { GeneralAlgorithms } from 'src/Utils/GeneralAlgorithms';
 import { TopologicalSorting } from 'src/Utils/TopologicalSorting';
 import { GraphBridges } from 'src/Utils/GraphBridges';
+import { ConvexHull } from 'src/Utils/ConvexHull';
 declare let fabric;
 
 export enum CanvasState {
@@ -29,7 +30,7 @@ export class SimulatorComponent implements OnInit {
   public canvasElementWidth: number;
   public canvasElementHeight: number;
   public zoom: number;
-  public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)', 'Check Bipartiteness', 'Topological Ordering', 'Find Bridges(Undirected graph)'];
+  public algorithms: string[] = ['Breadth first search', 'Uniform cost search', 'Depth first search', 'Depth first (Optimal)', 'Best-Fit (Greedy)', 'Best-Fit (A*)', 'Check Bipartiteness', 'Topological Ordering', 'Find Bridges(Undirected graph)', 'Convex Hull'];
   public selectedAlgorithm: string;
   public nodes: any = {};
   public edges: any = {};
@@ -414,6 +415,12 @@ export class SimulatorComponent implements OnInit {
         // Find Bridges(Undirected graph)
         const res = GraphBridges.Identify(this);
         this.snackBar.open(res.message, "Okay!");
+        return;
+      }
+      case this.algorithms[9]:{
+        // convex hull
+        const res = ConvexHull.Find(this);
+        this.snackBar.open(res.message, "Okay");
         return;
       }
     }
