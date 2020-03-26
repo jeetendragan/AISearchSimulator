@@ -14,11 +14,12 @@ Currently the project has the following algorithm categories and sub-categories
   - Bipartite Graph Checker
   - Topological sorting
   - Convex hull
+  - Finding bridges in a graph
   
 Other algorithms that can be added
 - Graph coloring
 - Connected components
-- Finding bridges in a graph
+- ~~Finding bridges in a graph~~
 - ~~Topological sorting~~
 - Maximum flow
 - and a lot more....
