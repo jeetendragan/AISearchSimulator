@@ -28,7 +28,7 @@ Looking forward to your contributions.
 
 # Run the project
 
-Here is the link to the project(https://ai-search-simulator.herokuapp.com)
+Here is the link to the project(https://jeetendragan.github.io/AISearchSimulator/)
 
 # Why should you contribute?
 I think you get to build some important skills through the project
